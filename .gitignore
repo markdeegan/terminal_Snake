@@ -1,0 +1,9 @@
+#ignore all executables
+*.exe
+
+#ignore all object files
+*.o
+
+#ignore all assembly files
+*.asm
+*.s
