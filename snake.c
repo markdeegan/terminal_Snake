@@ -15,7 +15,7 @@
 #include <time.h>
 
 //custom terminal control header
-#include "terminalControl.h"
+#include "inc/terminalControl.h"
 
 //macro defiition of the game area height
 #define AREAHEIGHT 20

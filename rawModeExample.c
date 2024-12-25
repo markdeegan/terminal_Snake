@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 //include my custom made library to ease terminal configuration
-#include "terminalControl.h" 
+#include "inc/terminalControl.h" 
 
 //macro for escape character to terminate the program once read
 #define escapeChar 'q' 

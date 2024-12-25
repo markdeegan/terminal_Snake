@@ -3,14 +3,14 @@
  * Purpose: The program will report back terminal cursor position on a specific key press
 */
 
-//Includes standard c header for I/O manipulation
-#include <stdio.h>
+//include a standard c header for string manipulation
+#include <string.h>
 
 //include standard c header for memory and datatype manipulation
 #include <stdlib.h>
 
 //include my header to manipulate the terminal
-#include "terminalControl.h"
+#include "inc/terminalControl.h"
 
 //macro definiton for character used to escape program loop
 #define ESCAPECHAR 'q'
@@ -37,18 +37,17 @@ int main(int argc, char** argv){
 	enterRawMode(&originalSettings);
 
 	//disable buffering in the output stream
-	setvbuf(stdout, NULL, _IONBF, 0);	
+	//setvbuf(stdout, NULL, _IONBF, 0);	
 	
 	//clear the terminal display and move cursor to home
 	printf("\e[2J\e[H");
 	
 	//decleration of a read buffer to read the input stream
 	char readBuffer[4096];
-	
-	char reportBuffer[4096];
 
 	int loopBreak = 0;
 
+	//print the below content with white background
 	printf("\e[47m");
 	
 	for(int i = 0; i < 20; i++){
@@ -63,62 +62,59 @@ int main(int argc, char** argv){
 	
 	}
 
-	printf("\e[m\e[H");
+	//end the white background control and return cursor to position 1,1
+	printf("\e[m\e[1;1H");
 
 	//start of program loop
 	while(!loopBreak){
-	
-		int x,y;
 		
-		ssize_t reportSize;
+		memset(readBuffer,0,sizeof(readBuffer));
 
 		//read the contents of stdin buffer
-		ssize_t readSize = read(STDIN_FILENO, &readBuffer, sizeof(readBuffer));
+		ssize_t readSize = read(STDIN_FILENO, &readBuffer, sizeof(readBuffer));	
 		
-		if(readSize <= 0){
+		//check if the buffer read something
+		if( readSize > 0 ){
+
+			//check the first character in the buffer is not a escape character 
+			if( !(readBuffer[0] == ESCAPECHAR || readBuffer[0] == ESCAPECHAR - 32) ){
+
+				//call function to move cursor
+				moveCursor(readBuffer[0]);
 				
+				//variables to store x and y positions of cursor
+				//int x,y;	
+				
+				//call function to request for cursor position
+				//readCursorPos(&x,&y);
 
-			reportSize = read(STDIN_FILENO, &reportBuffer, sizeof(reportBuffer));
+				//save cursor position, move to bottom of game area print the cursor pos and return to original position 	
+				//printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
 
-
-			//reads a formatted string using specified formatting
-			sscanf(reportBuffer,"\e[%d;%dR", &x, &y);//retrieve the cursor position
-			
+			}else{//the character is an escape character
 		
-			//just print the position constantly	
-			printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
+				loopBreak = 1;//break the while loop	
 
-			//perform nothing if we are not reading anything
+			}
+		}else{//nothing was read from the stdin
+		
 			continue;
 		
-		}
-
-		//check the first character in the buffer is not a escape character 
-		if( !(readBuffer[0] == ESCAPECHAR || readBuffer[0] == ESCAPECHAR - 32) ){
-
-			//call function to move cursor or report position
-			moveCursor(readBuffer[0]);
-			
-			printf("\e[6n");//request cursor position
-
-			reportSize = read(STDIN_FILENO, &reportBuffer, sizeof(reportBuffer));
-
-
-			//reads a formatted string using specified formatting
-			sscanf(reportBuffer,"\e[%d;%dR", &x, &y);//retrieve the cursor position
-
-			//just print the position constantly	
-			printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
-			
-		}else{
+		} 
 		
-			loopBreak = 1;	
+		int x,y;
 
-		}
+		readCursorPos(&x,&y);
+
+		printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
+
 
 	}
+	
+	//move cursor to a unused line 
+	printf("\e[22;1H");
 
-	return 0;
+	return 0;//return 0 indicating successful completion of program
 
 }
 
