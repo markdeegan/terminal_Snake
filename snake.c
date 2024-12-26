@@ -27,6 +27,7 @@
 //macro definition of snake movement delay time in seconds
 #define MOVEDELAY .25
 
+//macro definition to control the maximum size that is possible for the snake
 #define MAXSNAKESIZE ((AREAHEIGHT * ASPECTRATIO) * AREAHEIGHT)
 
 //definition of a snake part structure
@@ -53,7 +54,7 @@ void createGameArea();
 int checkControl(char* buffer);
 
 //decleration of function to move cursor to the give location
-void moveSnake(int direction,struct snakePart snake[MAXSNAKESIZE]);
+int moveSnake(int direction,struct snakePart snake[MAXSNAKESIZE]);
 
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(int x, int y);
@@ -101,19 +102,22 @@ int main(int argc, char** argv){
 	//defintion of game break condition variable
 	int gameBreak = 0;	
 	
+	//configurations for the head position of the snake	
 	snake[0].xPos = (AREAHEIGHT)/2;
 	snake[0].yPos = (AREAHEIGHT * ASPECTRATIO)/2;
 
-	//create a second part that will follow head
-	snake[1].xPos = snake[0].xPos;
-	snake[1].yPos = snake[0].yPos - 1;
+	//create the trail parts of the snake
+	for(int i = 1; i < lenght;i++){
 	
-	snake[2].xPos = snake[1].xPos;
-	snake[2].yPos = snake[1].yPos - 1;
+		snake[i].xPos = snake[i-1].xPos;
+		snake[i].yPos = snake[i-1].yPos -1;
+	
+	}
 
 	int direction = 4;//start with the direction going right
 	
-	//lenght = 3;	
+	//the output of the move
+	int moveCondition;	
 
 	//initalise the clock timer for movement
 	timeToMove = clock();
@@ -123,7 +127,7 @@ int main(int argc, char** argv){
 	
 	
 
-	//printf("\e[?25l");//make cursor invisible
+	printf("\e[?25l");//make cursor invisible
 
 	//start of game loop
 	while(!gameBreak){
@@ -165,12 +169,21 @@ int main(int argc, char** argv){
 			//print out the debug stats
 			printDebugStats(snake[0].xPos,snake[0].yPos);
 			printf("\e[s\e[%d;0H\e[Kx pos: %d, y pos: %d\e[u", (AREAHEIGHT + 2) + 3, snake[1].xPos, snake[1].yPos);//print for debugging the snake 1 part follow location	
-			printf("\e[s\e[%d;0H\e[Kx pos: %d, y pos: %d\e[u", (AREAHEIGHT + 2) + 4, snake[2].xPos, snake[2].yPos);//print for debugging the snake 2 part follow location	
+				
 		}
 		
 
 		//move snake in direction that was set
-		moveSnake(direction,snake);
+		moveCondition = moveSnake(direction,snake);
+		
+		//collision with self game over
+		if(moveCondition == 1){
+		
+			gameBreak = 1;
+				
+			printf("\e[s\e[%d;0H\e[Kcollided with %s\e[u", (AREAHEIGHT + 2) + 4, "snake part (Game over)");	
+		}
+		
 
 		//wait till the frame rate is matched
 		while((float) FRAMERATE > (float) (clock() - startTime)/CLOCKS_PER_SEC );
@@ -192,7 +205,7 @@ void exitRawMode(void){
 }
 
 //moves snake in give provided direction
-void moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){ 
+int moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){ 
 	
 	//check if enough time has passed since last movement
 	if( (float) (clock() - timeToMove)/CLOCKS_PER_SEC >= MOVEDELAY){
@@ -207,8 +220,6 @@ void moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){
 		}
 
 		void updateOtherParts(){
-		
-			//delete the last trailling part
 			
 			//if the trailling part isnt affecting borders
 			if( !((snake[lenght-1].xPos == 1) || (snake[lenght -1].xPos == AREAHEIGHT + 2 ) || ( snake[lenght - 1].yPos == 2) || (snake[lenght - 1].yPos == ((AREAHEIGHT * ASPECTRATIO) +2) )) ){
@@ -221,10 +232,21 @@ void moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){
 
 			//for loop will shift all the snake parts up
 			for(int i = lenght; i > 0; i--){
-				
+
 				snake[i].xPos = snake[i-1].xPos;
 				snake[i].yPos = snake[i-1].yPos;
 
+			}
+		
+		}
+
+		//loop through all snake parts to check for collision
+		for(int i = 1; i < lenght; i++){
+		
+			if(snake[0].xPos == snake[i].xPos && snake[0].yPos == snake[i].yPos){
+			
+				//collision happened
+				return 1;
 			}
 		
 		}
@@ -266,6 +288,7 @@ void moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){
 		switch(direction){
 	
 			case 1:
+
 				printf("\b\e[1A@");// move cursor right delete the character and move cursor up and print new head
 				changePos(snake[0].xPos - 1, snake[0].yPos);
 				break;
