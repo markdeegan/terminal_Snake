@@ -191,20 +191,24 @@ void moveSnake(int direction, int x, int y){
 		
 		//check if we reached upper boundary
 		if(direction == 1 && (x - 1) == 1){
-		
-			return;//we dont move the character
+			
+			printf("\b \e[%d;%dH@", AREAHEIGHT + 2 , y);	
+			return;
 		
 		}else if(direction == 3 && (y-1) == 2){//snake reached left boundary
-		
-			return;//we dont move the character
+			
+			printf("\b \e[%d;%dH@", x, (AREAHEIGHT * ASPECTRATIO) + 1);	
+			return;
 		
 		}else if(direction == 4 && ((y+1) == (AREAHEIGHT * ASPECTRATIO) + 3)){//snake reached right boundary
+			
+			printf("\b \e[%d;%dH@",x, 2);	
+			return;
 		
-			return;//we dont move the character
-		
-		}else if(direction == 2 && (x + 1) == (AREAHEIGHT + 3) ){
-		
-			return;//we dont move the character
+		}else if(direction == 2 && (x + 1) == (AREAHEIGHT + 3) ){//snake reached bottom boundary
+			
+			printf("\b \e[%d;%dH@", 2, y);
+			return;
 		
 		}
 
