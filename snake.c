@@ -16,13 +16,25 @@
 #define AREAHEIGHT 20
 
 //macro definition of the width to height aspect ratio
-#define ASPECTRATIO 2 
+#define ASPECTRATIO 1 
 
 //macro definition of escape character to break out of game loop
 #define ESCAPECHAR 'q'
 
 //macro definition of frame frame used to control the yield time of each frame
-#define FRAMERATE 1/120 
+#define FRAMERATE 1/60 
+
+//macro definition of snake movement delay time in seconds
+#define MOVEDELAY .25
+
+//structure that defines a snake body part that follows an adjacent parent
+struct snakePart {
+
+	int numRef;//number referance to indicate the  
+	int posX;
+	int posY;
+
+};
 
 //defines if game is ran in debugging mode (information printed to screen)
 int debuggingMode;
@@ -40,10 +52,13 @@ void createGameArea();
 int checkControl(char* buffer);
 
 //decleration of function to move cursor to the give location
-void moveSnake(int direction);
+void moveSnake(int direction,int x, int y);
 
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(int x, int y);
+
+//decleration of variable to hold the time since last snake movement
+clock_t timeToMove;
 
 //start of main method
 int main(int argc, char** argv){
@@ -81,10 +96,17 @@ int main(int argc, char** argv){
 	
 	//decleration of cursor position variables
 	int x = AREAHEIGHT/2, y = (AREAHEIGHT * ASPECTRATIO)/2;
+	
+	int direction = 4;//start with the direction going right
+	
+	//initalise the clock timer for movement
+	timeToMove = clock();
 
 	//decleration of read buffer
 	char buffer[4096];
 	
+	//printf("\e[?25l");//make cursor invisible
+
 	//start of game loop
 	while(!gameBreak){
 
@@ -103,19 +125,25 @@ int main(int argc, char** argv){
 				gameBreak = 1;//stop the game loop
 				
 			}
+			
+			//check if user pressed a vaild direction key and return direction
+			int newDirection = checkControl(buffer);
 
-			//call two functions one that checks the pressed key and the other moves in direction based on key
-			moveSnake(checkControl(buffer));	
+			if(!(newDirection == 0)){
+			
+				direction = newDirection;//set the new direction to the direction provided
+				
+			}
 			
 			//read the position after the cursor is moved by input
 			readCursorPos(&x,&y);
 
-		}else{//the read failed
+		}else{//the read failed or nothing was inputted
 				
-			//handle for the error
+			//continue snake movement in previous direction
 
 		}
-		
+
 		//check if debugging mode is on
 		if(debuggingMode){
 			
@@ -123,6 +151,12 @@ int main(int argc, char** argv){
 			printDebugStats(x,y);
 		
 		}
+		
+		//move snake in direction that was set
+		moveSnake(direction,x,y);
+
+		//read cursor position after movement
+		readCursorPos(&x, &y);
 
 		//wait till the frame rate is matched
 		while((float) FRAMERATE > (float) (clock() - startTime)/CLOCKS_PER_SEC );
@@ -132,7 +166,7 @@ int main(int argc, char** argv){
 	
 	}
 
-	printf("\e[22;0H");//returns cursor to out of bound area of game space
+	printf("\e[?25h\e[%d;0H",(AREAHEIGHT + 2) + 3);//returns cursor to out of bound area of game space and make it visible again
 
 	return 0;//exit with error code 0 to indicate successful completion of program
 
@@ -147,25 +181,51 @@ void exitRawMode(void){
 }
 
 //moves snake in give provided direction
-void moveSnake(int direction){
+void moveSnake(int direction, int x, int y){
 
-	switch(direction){
+	//check if enough time has passed since last movement
+	if( (float) (clock() - timeToMove)/CLOCKS_PER_SEC >= MOVEDELAY){
+		
+		//rest the timer
+		timeToMove = clock();
+		
+		//check if we reached upper boundary
+		if(direction == 1 && (x - 1) == 1){
+		
+			return;//we dont move the character
+		
+		}else if(direction == 3 && (y-1) == 2){//snake reached left boundary
+		
+			return;//we dont move the character
+		
+		}else if(direction == 4 && ((y+1) == (AREAHEIGHT * ASPECTRATIO) + 3)){//snake reached right boundary
+		
+			return;//we dont move the character
+		
+		}else if(direction == 2 && (x + 1) == (AREAHEIGHT + 3) ){
+		
+			return;//we dont move the character
+		
+		}
+
+		//switch case to move snake
+		switch(direction){
 	
-		case 1:
-			printf("\e[1A");//move cursor up
-			break;
-		case 2:
-			printf("\e[1B");//move cursor down
-			break;
-		case 3:
-			printf("\e[1D");//move cursor left
-			break;
-		case 4:
-			printf("\e[1C"); //move cursor right
-			break;
+			case 1:
+				printf("\b \b\e[1A@");// move cursor right delete the character and move cursor up and print new head
+				break;
+			case 2:
+				printf("\b \b\e[1B@");//move cursor down
+				break;
+			case 3:
+				printf("\b \b\e[1D@");//move cursor left
+				break;
+			case 4:
+				printf("\b \b\e[1C@"); //move cursor right
+				break;
 
+		}	
 	}
-
 }
 
 //definition of snake control function (returns direction int 1 = forward, 2 = backwards, 3 = left, 4 = right)
@@ -191,33 +251,71 @@ int checkControl(char* buffer){
 		case 'D':
 			return 4;//return right direction
 	
+		default:
+			return 0;//return 0 indicating no change
 	}
-
 }
 
 //definition of function to generate the game area
 void createGameArea(){
 	
-	//clear screen, move the cursor to 0,0 and make the background colour white
-	printf("\e[2J\e[H\e[47m");
+	//clear screen, move the cursor to 0,0
+	printf("\e[2J\e[H");
 
 	//loop through all the game area rows
-	for(int i = 0; i < AREAHEIGHT; i++){
-	
-		//loop through all the column values
-		for(int j = 0; j < AREAHEIGHT * ASPECTRATIO; j++){
+	for(int i = 0; i <= AREAHEIGHT + 2; i++){
+
+		if(i == 0){
 		
-			//print an empty character
-			printf(" ");
+			printf("\u250F");//draws left top corner
+		
+		}else if(i == AREAHEIGHT + 2){
+		
+			printf("\u2517");//draws bottom right corner
+		
+		}else{
+		
+			printf("%c", '|');//draw a straight line
+			
+		}
+
+		//loop through all the column values
+		for(int j = 0; j < (AREAHEIGHT * ASPECTRATIO); j++){
+		
+			//check if the current line is the top or bottom
+			if( (i == 0 ) ||  (i == AREAHEIGHT + 2) ){
+			
+				printf("-");//prints a heavy straight bar
+			
+			}else{//anything in between
+			
+				printf(" ");//print an empty space	
+			
+			}
 		
 		}
+
+		if(i == 0){
+		
+			printf("\u2513");//prints top right corner
+		
+		}else if(i == AREAHEIGHT + 2){
+		
+			printf("\u251B");//prints bottom right corner
+		
+		}else{
+		
+			printf("%c",'|');//prints a straight line
+		
+		}
+
 		//start on a new line	
 		printf("\n");
 
 	}
 	
 	//reset graphics mode and move cursor to the middle of the screen
-	printf("\e[m\e[%d;%dH", AREAHEIGHT/2, (AREAHEIGHT * ASPECTRATIO)/2);
+	printf("\e[%d;%dH", AREAHEIGHT/2, (AREAHEIGHT * ASPECTRATIO)/2);
 
 }
 
@@ -225,6 +323,6 @@ void createGameArea(){
 void printDebugStats(int x, int y){
 
 	//print cursor position
-	printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
+	printf("\e[s\e[%d;0H\e[Kx pos: %d, y pos: %d\e[u", (AREAHEIGHT + 2) + 2 ,x,y);
 	
 }

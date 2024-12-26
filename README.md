@@ -1,7 +1,7 @@
 # Introduction
 This repository is made to showcase the ability to control the terminal to behave as a game rendering window. Currently the programs provided on this repository are only compliant with POSIX operating systems.
 
-# Contents
+# Content
 * cursor position reading
 * terminal setting configuration
 * frame rendering control
