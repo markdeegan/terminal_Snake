@@ -11,3 +11,6 @@ This repository is made to showcase the ability to control the terminal to behav
 ## Currently in the works
 The current tasks that are planned to implemented are as follows:
 * cross compiling to windows and linux distrbutions
+
+# Useful links
+* [ANSI ESCAPE CODES](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
