@@ -1,12 +1,7 @@
 /*
  * programmer: Matas Noreika Tue Dec 24 08:19:06 PM GMT 2024
- * Purpose: To create a basic snake game using the terminal in raw mode.
- *
+ * Purpose: To create a basic snake game using the terminal.
 */
-
-
-//standard c header to have functionality to print and read from streams
-#include <stdio.h>
 
 //standard c header for memeory allocation control and exit handlling
 #include <stdlib.h>
@@ -27,7 +22,10 @@
 #define ESCAPECHAR 'q'
 
 //macro definition of frame frame used to control the yield time of each frame
-#define FRAMERATE 1/60 
+#define FRAMERATE 1/120 
+
+//defines if game is ran in debugging mode (information printed to screen)
+int debuggingMode;
 
 //decleration of variable to store old terminal settings
 struct termios original_Settings;
@@ -44,49 +42,52 @@ int checkControl(char* buffer);
 //decleration of function to move cursor to the give location
 void moveSnake(int direction);
 
-//decleration of function to return the cursor position
-void returnCursorPos(int* x, int* y);
+//decleration of function to print debugging stats to terminal if debug mode is enabled
+void printDebugStats(int x, int y);
 
 //start of main method
 int main(int argc, char** argv){
 
+	//if additional parameters are passed into the program
+	if(!(argc == 1)){
 	
-	
+		//argument 1 controls debugging mode
+		debuggingMode = atoi(argv[1]);
+		
+		//enable debugging mode if the atoi returns exactly 1
+		if(debuggingMode > 1){
+			
+			//debugging mode is off
+			debuggingMode = 0;
+		
+		}
+
+	}
+
 	//store the current terminal settings into the original settings variable
 	tcgetattr(STDIN_FILENO, &original_Settings);
 	
 	//bind exitRawMode function on exit of program
 	atexit(exitRawMode);
-
-	//sets the stdout to not buffer any content
-	//_IONBF: mode to set file stream to not buffer
-	setvbuf(stdout, NULL, _IONBF, 0);
-	
-	int x,y;
-	returnCursorPos(&x,&y);
-	printf("x : %d, y : %d", x, y);
 	
 	//call enterRawMode function to set the terminal to raw mode
 	enterRawMode(&original_Settings);
-	/*
-	//clear the terminal screen
-	printf("\e[2J\n");
 
 	//create the game area
 	createGameArea();
 
-	//move cursor to the middle of the game area
-	printf("\e[10;20H");
-
 	//defintion of game break condition variable
 	int gameBreak = 0;
+	
+	//decleration of cursor position variables
+	int x = AREAHEIGHT/2, y = (AREAHEIGHT * ASPECTRATIO)/2;
 
 	//decleration of read buffer
 	char buffer[4096];
-
+	
 	//start of game loop
 	while(!gameBreak){
-	
+
 		//definition of varible to store the time at the start of the frame
 		clock_t startTime = clock();
 
@@ -106,6 +107,8 @@ int main(int argc, char** argv){
 			//call two functions one that checks the pressed key and the other moves in direction based on key
 			moveSnake(checkControl(buffer));	
 			
+			//read the position after the cursor is moved by input
+			readCursorPos(&x,&y);
 
 		}else{//the read failed
 				
@@ -113,6 +116,14 @@ int main(int argc, char** argv){
 
 		}
 		
+		//check if debugging mode is on
+		if(debuggingMode){
+			
+			//print out the debug stats
+			printDebugStats(x,y);
+		
+		}
+
 		//wait till the frame rate is matched
 		while((float) FRAMERATE > (float) (clock() - startTime)/CLOCKS_PER_SEC );
 
@@ -120,7 +131,9 @@ int main(int argc, char** argv){
 		//printf("frame completed: %.6f", (float) (clock() - startTime)/CLOCKS_PER_SEC);
 	
 	}
-*/
+
+	printf("\e[22;0H");//returns cursor to out of bound area of game space
+
 	return 0;//exit with error code 0 to indicate successful completion of program
 
 }
@@ -133,85 +146,22 @@ void exitRawMode(void){
 
 }
 
-//definition of function to return the position of cursor
-void returnCursorPos(int* x, int* y){
-	
-	//request cursor position report
-	char writeBuf = "\e[6n";
-
-	write(STDOUT_FILENO,writeBuf, sizeof(writeBuf));
-	
-	//decleration of read buffer
-	char buffer[4096];
-	
-	//x string to append each x character value to
-	char* xValue = "";
-
-	//y string to append each y character value to
-	char* yValue = "";
-
-	//read the stdin where the cursor report is sent 
-	ssize_t readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));
-
-	//loop through all characters in the buffer
-	//report format is ESC[X;YR
-	//we will skip the first two values as we are only interested in the x and y
-	
-	int xFinished = 0;
-	int lastXPos = 0;
-
-	for(int i = 2; i < readSize; i++){
-		
-		//check if its the end of the report
-		if(buffer[i] == 'R'){
-		
-			break;//break for loop
-		
-		}
-
-		//check if the x value is finished
-		if(buffer[i] == ';'){
-		
-			xFinished = 1;
-			lastXPos = i+1;
-			continue;
-		
-		}
-
-		if(!xFinished){
-			
-			//append the value to the x string
-			xValue[i-2] = buffer[i];
-		
-		}else{
-			//offset from last x value
-			yValue[i-2-lastXPos] = buffer[i]; 
-		
-		}	
-	
-	}
-
-	*x = atoi(xValue);
-	*y = atoi(yValue);
-
-}
-
 //moves snake in give provided direction
 void moveSnake(int direction){
 
 	switch(direction){
 	
 		case 1:
-			printf("\e[1A");
+			printf("\e[1A");//move cursor up
 			break;
 		case 2:
-			printf("\e[1B");
+			printf("\e[1B");//move cursor down
 			break;
 		case 3:
-			printf("\e[1D");
+			printf("\e[1D");//move cursor left
 			break;
 		case 4:
-			printf("\e[1C");
+			printf("\e[1C"); //move cursor right
 			break;
 
 	}
@@ -248,8 +198,8 @@ int checkControl(char* buffer){
 //definition of function to generate the game area
 void createGameArea(){
 	
-	//move the cursor to 0,0 and make the background colour white
-	printf("\e[H\e[47m");
+	//clear screen, move the cursor to 0,0 and make the background colour white
+	printf("\e[2J\e[H\e[47m");
 
 	//loop through all the game area rows
 	for(int i = 0; i < AREAHEIGHT; i++){
@@ -266,7 +216,15 @@ void createGameArea(){
 
 	}
 	
-	//reset graphics mode
-	printf("\e[m");
+	//reset graphics mode and move cursor to the middle of the screen
+	printf("\e[m\e[%d;%dH", AREAHEIGHT/2, (AREAHEIGHT * ASPECTRATIO)/2);
 
+}
+
+//definition of function to print program debugging stats
+void printDebugStats(int x, int y){
+
+	//print cursor position
+	printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
+	
 }
