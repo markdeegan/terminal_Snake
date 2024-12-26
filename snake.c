@@ -6,7 +6,7 @@
 //standard c header for memeory allocation control and exit handlling
 #include <stdlib.h>
 
-//standard c library for time functionality
+//standard c header for time functionality
 #include <time.h>
 
 //custom terminal control header

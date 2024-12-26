@@ -1,6 +1,6 @@
 /*
  * Programmer: Matas Noreika Wed Dec 25 06:11:33 PM GMT 2024
- * Purpose: The program will report back terminal cursor position on a specific key press
+ * Purpose: The program will report back terminal cursor position the program also allows users to move their cursor using wasd keys
 */
 
 //include a standard c header for string manipulation
