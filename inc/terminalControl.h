@@ -12,6 +12,18 @@
 //POSIX c library to control the terminal settings and behaviour
 #include <termios.h>
 
+//POSIX c library used to communicate with kernel (used to get terminal width)
+#include <sys/ioctl.h>
+
+void getTerminalSize(){
+
+	struct winsize sz;//create an instance of structure winsize defined in ioctl.h
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &sz);
+
+	printf("x size: %d, y size: %d\n",sz.ws_row,sz.ws_col);//print out the size retrieved
+
+}
+
 //function to enter raw mode from concoical mode
 void enterRawMode(struct termios* originalSettings){
 

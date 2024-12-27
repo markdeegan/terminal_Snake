@@ -1,5 +1,5 @@
 #rule to make all executables
-all: snake rawModeExample cursorReadingTutorial
+all: snake rawModeExample cursorReadingTutorial asciiArtTitle
 
 #removes all executables in the binary folder 
 clean: 
@@ -16,3 +16,6 @@ rawModeExample: rawModeExample.c
 #rule to make example program for cursor position reporting
 cursorReadingTutorial: cursorReadingTutorial.c
 	gcc -o ./bin/cursorReadingTutorial.exe cursorReadingTutorial.c
+
+asciiArtTitle: asciiArtTitle.c
+	gcc -o ./bin/asciiArtTitle.exe asciiArtTitle.c
