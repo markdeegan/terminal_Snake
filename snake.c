@@ -27,6 +27,9 @@ void exitRawMode(void);
 //decleration of function to move cursor to the give location
 int moveSnake(int direction,struct snakePart snake[MAXSNAKESIZE]);
 
+//decleration of function to add fruit
+void addFruit();
+
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(int x, int y);
 
@@ -38,6 +41,9 @@ struct snakePart snake[MAXSNAKESIZE];
 
 //decleration of snake lenght variable
 int lenght = 3;
+
+//decleration of fruit (uses snakePart struct)
+struct snakePart fruit;
 
 //start of main method
 int main(int argc, char** argv){
@@ -101,6 +107,8 @@ int main(int argc, char** argv){
 
 	//decleration of read buffer
 	char buffer[4096];	
+
+	addFruit();
 
 	//printf("\e[?25l");//make cursor invisible
 
@@ -177,6 +185,78 @@ void exitRawMode(void){
 
 	//set terminal to old saved settings
 	tcsetattr(STDIN_FILENO, TCSANOW, &original_Settings);
+
+}
+
+//definition of function to add to snake lenght
+void addLenght(int direction){
+
+	lenght++;//incrament the lenght variable
+	
+	//we do a switch case on direction to determine where new snake part should spawn relative to previous snake part
+	switch(direction){
+	
+		case 1://we are moving up
+			
+			snake[lenght-1].xPos = snake[lenght-2].xPos + 1;
+		       	snake[lenght-1].yPos = snake[lenght-2].yPos;	
+			break;
+
+		case 2://we are moving down
+			
+			snake[lenght-1].xPos = snake[lenght-2].xPos - 1;
+			snake[lenght-1].yPos = snake[lenght-2].yPos;
+			break;
+
+		case 3://we are moving left
+			
+			snake[lenght-1].xPos = snake[lenght-2].xPos;
+			snake[lenght-1].yPos = snake[lenght-2].yPos - 1;
+			break;
+
+		case 4://we are moving right
+
+			snake[lenght-1].xPos = snake[lenght-2].xPos;
+			snake[lenght-1].yPos = snake[lenght-2].yPos + 1;
+			break;
+	
+	}
+
+}
+
+//definition of function to add fruit
+void addFruit(){
+
+	//variable to control looping
+	int positionTaken = 1;
+
+	void pickLocation(){
+		
+		fruit.xPos = rand() % ((LOWERBOUND-1) - (UPPERBOUND+1) + 1) + (UPPERBOUND+1);//choose a random row position
+		fruit.yPos = rand() % ((RIGHTBOUND-1) - (LEFTBOUND+1) + 1) + (LEFTBOUND+1);//choose a random column position
+	
+	}
+	
+	//repeat picking a location and testing to see if the position is taken
+	while(positionTaken){
+		
+		positionTaken = 0;//set the position as not taken
+		pickLocation();//pick a random location for fruit
+
+		//loop through all snake parts in lenght
+		for(int i = 0; i < lenght; i++){
+			
+			if(fruit.xPos == snake[i].xPos && fruit.yPos == snake[i].yPos){
+				
+				positionTaken = 1;//set the position as taken
+				break;//dont continue the rest of the loop
+			
+			}
+		}	
+	}
+	
+	//print the fruit out
+	printf("\e7\e[%d;%dH\bo\e8",fruit.xPos,fruit.yPos);
 
 }
 
@@ -271,18 +351,45 @@ int moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){
 
 		//updateOtherParts();
 		
+		//variable to determine if fruit should be printed
+		int rePrintFruit = 1;
+
+		//check if head collided with fruit (we add extra lenght and a new fruit)
+		if(snake[0].xPos == fruit.xPos && snake[0].yPos == fruit.yPos){
+	
+			addLenght(direction);//call function to add to snake lenght
+			addFruit();//call the add fruit function
+			rePrintFruit = 0;//wont print the fruit again
+
+		}
+
 		//loop through all snake parts to check for collision
 		for(int i = 1; i < lenght; i++){
 		
+			//checks if snake collided with self
 			if(snake[0].xPos == snake[i].xPos && snake[0].yPos == snake[i].yPos){
 			
-				//collision happened
+				//collision happened (set game to game over)
 				return 1;
 			}
+
+			//checks if fruit is currently underneath a snake part
+			if(snake[i].xPos == fruit.xPos && snake[i].yPos == fruit.yPos){
+			
+				rePrintFruit = 0;//we wont print the fruit over the snake part
+			
+			}
+
+		}
+		
+		//if the fruit needs to be reprinted	
+		if(rePrintFruit){
+			
+			//we reprint the fruit on the screen
+			printf("\e7\e[%d;%dH\bo\e8", fruit.xPos, fruit.yPos);
 		
 		}
-
-
+		
 	}
 }
 
