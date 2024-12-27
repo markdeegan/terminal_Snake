@@ -37,7 +37,7 @@
 #define LEFTBOUND 2
 
 //macro definition to define the right boundary of the game area
-#define RIGHTBOUND (ASPECTRATIO * AREAHEIGHT + 2)
+#define RIGHTBOUND ((ASPECTRATIO * AREAHEIGHT) + 3)
 
 //definition of a snake part structure
 struct snakePart {

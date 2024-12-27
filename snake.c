@@ -164,8 +164,9 @@ int main(int argc, char** argv){
 		while((float) FRAMERATE > (float) (clock() - startTime)/CLOCKS_PER_SEC );
 	
 	}
-
-	printf("\e[?25h\e[%d;0H",LOWERBOUND+3);//returns cursor to out of bound area of game space and make it visible again
+	
+	printf("\e[%d;0HUpper: %d, lower: %d, left: %d, right: %d\n", LOWERBOUND + 3, UPPERBOUND, LOWERBOUND, LEFTBOUND, RIGHTBOUND);
+	printf("\e[?25h\e[%d;0H",LOWERBOUND+4);//returns cursor to out of bound area of game space and make it visible again
 
 	return 0;//exit with error code 0 to indicate successful completion of program
 
@@ -199,10 +200,10 @@ int moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){
 			
 			
 			//if the trailling part isnt affecting borders
-			if( !((snake[lenght-1].xPos == LEFTBOUND) || (snake[lenght -1].xPos == RIGHTBOUND ) || ( snake[lenght - 1].yPos == UPPERBOUND) || (snake[lenght - 1].yPos == LOWERBOUND )) ){
+			if( !((snake[lenght-1].yPos == LEFTBOUND) || (snake[lenght -1].yPos == RIGHTBOUND ) || ( snake[lenght - 1].xPos == UPPERBOUND) || (snake[lenght - 1].xPos == LOWERBOUND )) ){
 					
 				//delete the last trailling part
-				printf("\e7\e[%d;%dH\b^\e8",snake[lenght-1].xPos, snake[lenght-1].yPos);
+				printf("\e7\e[%d;%dH\b \e8",snake[lenght-1].xPos, snake[lenght-1].yPos);
 	
 
 			}
@@ -225,23 +226,23 @@ int moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){
 		//check if we reached upper boundary
 		if(direction == 1 && (snake[0].xPos - 1) == UPPERBOUND){
 			
-			printf("\e[%d;%dH", LOWERBOUND - 1, snake[0].yPos);
-			changePos(LOWERBOUND - 1, snake[0].yPos);
+			printf("\e[%d;%dH", LOWERBOUND, snake[0].yPos);
+			changePos(LOWERBOUND, snake[0].yPos);
 		
 		}else if(direction == 3 && (snake[0].yPos-1) == LEFTBOUND){//snake reached left boundary
 			
-			printf("\e[%d;%dH",snake[0].xPos, RIGHTBOUND - 1);	
-			changePos(snake[0].xPos, RIGHTBOUND - 1);
+			printf("\e[%d;%dH",snake[0].xPos, RIGHTBOUND);	
+			changePos(snake[0].xPos, RIGHTBOUND);
 		
 		}else if(direction == 4 && ((snake[0].yPos+1) == RIGHTBOUND)){//snake reached right boundary
 			
-			printf("\e[%d;%dH",snake[0].xPos, LEFTBOUND + 1);
-			changePos(snake[0].xPos, LEFTBOUND + 1);
+			printf("\e[%d;%dH",snake[0].xPos, LEFTBOUND);
+			changePos(snake[0].xPos, LEFTBOUND);
 		
 		}else if(direction == 2 && (snake[0].xPos + 1) == LOWERBOUND ){//snake reached bottom boundary
 			
-			printf("\e[%d;%dH", UPPERBOUND + 1, snake[0].yPos);
-			changePos( UPPERBOUND + 1, snake[0].yPos);	
+			printf("\e[%d;%dH", UPPERBOUND, snake[0].yPos);
+			changePos( UPPERBOUND, snake[0].yPos);	
 		
 		}
 
