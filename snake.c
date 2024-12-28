@@ -15,38 +15,44 @@
 //custom snake game header
 #include "inc/snake.h"
 
-//defines if game is ran in debugging mode (information printed to screen)
-int debuggingMode;
-
 //decleration of variable to store old terminal settings
 struct termios original_Settings;
 
 //decleration of exit raw mode function to prevent complier errors
 void exitRawMode(void);
 
-//decleration of function to move cursor to the give location
-int moveSnake(int direction,struct snakePart snake[MAXSNAKESIZE]);
-
-//decleration of function to add fruit
-void addFruit();
-
 //decleration of function to print debugging stats to terminal if debug mode is enabled
-void printDebugStats(int x, int y);
-
-//decleration of variable to hold the time since last snake movement
-clock_t timeToMove;
-
-//decleration of snake variable
-struct snakePart snake[MAXSNAKESIZE];
-
-//decleration of snake lenght variable
-int lenght = 3;
-
-//decleration of fruit (uses snakePart struct)
-struct snakePart fruit;
+void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y);
 
 //start of main method
 int main(int argc, char** argv){
+	
+	//defines if the game is ran in debugging mode (infromation printed on screen)
+	int debuggingMode;
+
+	//decleration of variable to hold the time since last snake move
+	clock_t timeToMove;
+
+	//decleration of snake variable
+	struct snakePart snake[MAXSNAKESIZE];
+
+	//definition of snake lenght variable
+	int lenght = 3;
+	
+	//definition of snake direction variable
+	int direction = 4;
+
+	//decleration of moveCondition variable used to hold return value of moveSnake()
+	int moveCondition;
+
+	//definition of gameBreak variable to control the game loop
+	int gameBreak = 0;
+
+	//decleration of read buffer to hold input buffer contents for processing key presses
+	char buffer[4096];	
+
+	//decleration of fruit variable
+	struct snakePart fruit;
 
 	//if additional parameters are passed into the program
 	if(!(argc == 1)){
@@ -73,17 +79,15 @@ int main(int argc, char** argv){
 	//call enterRawMode function to set the terminal to raw mode
 	enterRawMode(&original_Settings);
 
-	//clear screen, move the cursor to 0,0
-	printf("\e[2J\e[H");
+	//Matas - merged two printf function calls into one to reduces printf calls
+	//clear screen, move the cursor to 0,0 and make cursor invisible
+	printf("\e[2J\e[H\e[?25l");
 
 	//prints the game title at the top of the screen
 	printTitle();
 
 	//create the game area
 	createGameArea();
-
-	//defintion of game break condition variable
-	int gameBreak = 0;	
 	
 	//configurations for the head position of the snake	
 	snake[0].xPos = LOWERBOUND - ((LOWERBOUND-UPPERBOUND)/2);
@@ -97,20 +101,10 @@ int main(int argc, char** argv){
 	
 	}
 
-	int direction = 4;//start with the direction going right
-	
-	//the output of the move
-	int moveCondition;	
-
 	//initalise the clock timer for movement
 	timeToMove = clock();
 
-	//decleration of read buffer
-	char buffer[4096];	
-
-	addFruit();
-
-	//printf("\e[?25l");//make cursor invisible
+	addFruit(snake, &fruit, lenght);
 
 	//start of game loop
 	while(!gameBreak){
@@ -150,13 +144,13 @@ int main(int argc, char** argv){
 		if(debuggingMode){
 			
 			//print out the debug stats
-			printDebugStats(snake[0].xPos,snake[0].yPos);
+			printDebugStats(snake,lenght,snake[0].xPos,snake[0].yPos);
 				
 		}
 		
 
 		//move snake in direction that was set
-		moveCondition = moveSnake(direction,snake);
+		moveCondition = moveSnake(snake, &fruit,&lenght,direction, &timeToMove );
 		
 		//collision with self game over
 		if(moveCondition == 1){
@@ -188,228 +182,13 @@ void exitRawMode(void){
 
 }
 
-//definition of function to add to snake lenght
-void addLenght(int direction){
-
-	lenght++;//incrament the lenght variable
-	
-	//we do a switch case on direction to determine where new snake part should spawn relative to previous snake part
-	switch(direction){
-	
-		case 1://we are moving up
-			
-			snake[lenght-1].xPos = snake[lenght-2].xPos + 1;
-		       	snake[lenght-1].yPos = snake[lenght-2].yPos;	
-			break;
-
-		case 2://we are moving down
-			
-			snake[lenght-1].xPos = snake[lenght-2].xPos - 1;
-			snake[lenght-1].yPos = snake[lenght-2].yPos;
-			break;
-
-		case 3://we are moving left
-			
-			snake[lenght-1].xPos = snake[lenght-2].xPos;
-			snake[lenght-1].yPos = snake[lenght-2].yPos - 1;
-			break;
-
-		case 4://we are moving right
-
-			snake[lenght-1].xPos = snake[lenght-2].xPos;
-			snake[lenght-1].yPos = snake[lenght-2].yPos + 1;
-			break;
-	
-	}
-
-}
-
-// MD20241228-01  moved definition of pickLocation function out of the addFruit function
-void pickLocation(){
-	
-	fruit.xPos = rand() % ((LOWERBOUND-1) - (UPPERBOUND+1) + 1) + (UPPERBOUND+1);//choose a random row position
-	fruit.yPos = rand() % ((RIGHTBOUND-1) - (LEFTBOUND+1) + 1) + (LEFTBOUND+1);//choose a random column position
-
-} // MD20241228-02 end definition of the pickLocation function
-
-//definition of function to add fruit
-void addFruit(){
-
-	//variable to control looping
-	int positionTaken = 1;
-
-
-	
-	//repeat picking a location and testing to see if the position is taken
-	while(positionTaken){
-		
-		positionTaken = 0;//set the position as not taken
-		pickLocation();//pick a random location for fruit
-
-		//loop through all snake parts in lenght
-		for(int i = 0; i < lenght; i++){
-			
-			if(fruit.xPos == snake[i].xPos && fruit.yPos == snake[i].yPos){
-				
-				positionTaken = 1;//set the position as taken
-				break;//dont continue the rest of the loop
-			
-			}
-		}	
-	}
-	
-	//print the fruit out
-	printf("\e7\e[%d;%dH\bo\e8",fruit.xPos,fruit.yPos);
-
-}
-
-// MD20241228-03 moved the changePos funciton out of the moveSnake function
-//function to change the position to new location
-void changePos(int x, int y){
-
-	snake[0].xPos = x;
-
-	snake[0].yPos = y;
-
-} // MD20241228-04 end definition of the changePos function
-
-
-		
-// MD20241228-05 moved the updateOtherParts function out of the moveSnake function
-//function to update the trailling part positions and delete the last location
-void updateOtherParts(){
-	
-	
-	//if the trailling part isnt affecting borders
-	if( !((snake[lenght-1].yPos == LEFTBOUND) || (snake[lenght -1].yPos == RIGHTBOUND ) || ( snake[lenght - 1].xPos == UPPERBOUND) || (snake[lenght - 1].xPos == LOWERBOUND )) ){
-			
-		//delete the last trailling part
-		printf("\e7\e[%d;%dH\b \e8",snake[lenght-1].xPos, snake[lenght-1].yPos);
-
-
-	}
-
-	//for loop will shift all the snake parts up
-	for(int i = lenght; i > 0; i--){
-
-		snake[i].xPos = snake[i-1].xPos;
-		snake[i].yPos = snake[i-1].yPos;
-
-	}
-
-} // MD20241228-06 end definition of the updateOtherParts function
-
-//moves snake in give provided direction
-int moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){ 
-	
-	//check if enough time has passed since last movement
-	if( (float) (clock() - timeToMove)/CLOCKS_PER_SEC >= MOVEDELAY){
-		
-		
-
-		//rest the timer
-		timeToMove = clock();
-		
-		updateOtherParts();
-
-		//check if we reached upper boundary
-		if(direction == 1 && (snake[0].xPos - 1) == UPPERBOUND){
-			
-			printf("\e[%d;%dH", LOWERBOUND, snake[0].yPos);
-			changePos(LOWERBOUND, snake[0].yPos);
-		
-		}else if(direction == 3 && (snake[0].yPos-1) == LEFTBOUND){//snake reached left boundary
-			
-			printf("\e[%d;%dH",snake[0].xPos, RIGHTBOUND);	
-			changePos(snake[0].xPos, RIGHTBOUND);
-		
-		}else if(direction == 4 && ((snake[0].yPos+1) == RIGHTBOUND)){//snake reached right boundary
-			
-			printf("\e[%d;%dH",snake[0].xPos, LEFTBOUND);
-			changePos(snake[0].xPos, LEFTBOUND);
-		
-		}else if(direction == 2 && (snake[0].xPos + 1) == LOWERBOUND ){//snake reached bottom boundary
-			
-			printf("\e[%d;%dH", UPPERBOUND, snake[0].yPos);
-			changePos( UPPERBOUND, snake[0].yPos);	
-		
-		}
-
-		//switch case to move snake
-		switch(direction){
-	
-			case 1:
-
-				printf("\e[1A\b@");// move cursor right delete the character and move cursor up and print new head
-				changePos(snake[0].xPos - 1, snake[0].yPos);
-				break;
-			case 2:
-				printf("\e[1B\b@");//move cursor down
-				changePos(snake[0].xPos + 1, snake[0].yPos);	
-				break;
-			case 3:
-				printf("\e[1D\b@");//move cursor left
-				changePos(snake[0].xPos, snake[0].yPos - 1);	
-				break;
-			case 4:
-				printf("\e[1C\b@"); //move cursor right
-				changePos(snake[0].xPos, snake[0].yPos + 1);
-				break;
-
-		}
-
-		//updateOtherParts();
-		
-		//variable to determine if fruit should be printed
-		int rePrintFruit = 1;
-
-		//check if head collided with fruit (we add extra lenght and a new fruit)
-		if(snake[0].xPos == fruit.xPos && snake[0].yPos == fruit.yPos){
-	
-			addLenght(direction);//call function to add to snake lenght
-			addFruit();//call the add fruit function
-			rePrintFruit = 0;//wont print the fruit again
-
-		}
-
-		//loop through all snake parts to check for collision
-		for(int i = 1; i < lenght; i++){
-		
-			//checks if snake collided with self
-			if(snake[0].xPos == snake[i].xPos && snake[0].yPos == snake[i].yPos){
-			
-				//collision happened (set game to game over)
-				return 1;
-			}
-
-			//checks if fruit is currently underneath a snake part
-			if(snake[i].xPos == fruit.xPos && snake[i].yPos == fruit.yPos){
-			
-				rePrintFruit = 0;//we wont print the fruit over the snake part
-			
-			}
-
-		}
-		
-		//if the fruit needs to be reprinted	
-		if(rePrintFruit){
-			
-			//we reprint the fruit on the screen
-			printf("\e7\e[%d;%dH\bo\e8", fruit.xPos, fruit.yPos);
-		
-		}
-		
-	}
-	// MD20241228-07 inserting retutn 0 call, as this function (moveSnake) is defined as retutning an int
-	return 0;
-} // MD20241228-08 end definition of the moveSnake function
-
 //definition of function to print program debugging stats
-void printDebugStats(int x, int y){
+void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y){
 
 	//print cursor position
 	printf("\e7\e[%d;0H\e[Kx pos: %d, y pos: %d\e8", LOWERBOUND + 1,x,y);
 	
+	//print the difference in position from head to last snake part	
 	printf("\e7\e[%d;0H\e[Kx diff: %d, y diff: %d\e8", LOWERBOUND + 2,snake[0].xPos - snake[lenght-1].xPos,snake[0].yPos - snake[lenght-1].yPos);
 	
 }
