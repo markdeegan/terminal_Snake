@@ -3,7 +3,7 @@ all: snake rawModeExample cursorReadingTutorial asciiArtTitle
 
 #removes all executables in the binary folder 
 clean: 
-	rm ./bin/*.exe
+	@-rm ./bin/*.exe > /dev/null || true
 
 #rule to make the snake executable
 snake: snake.c
