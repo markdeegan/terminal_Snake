@@ -7,3 +7,4 @@
 #ignore all assembly files
 *.asm
 *.s
+a.out
