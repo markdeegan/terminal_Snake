@@ -224,18 +224,21 @@ void addLenght(int direction){
 
 }
 
+// MD20241228-01  moved definition of pickLocation function out of the addFruit function
+void pickLocation(){
+	
+	fruit.xPos = rand() % ((LOWERBOUND-1) - (UPPERBOUND+1) + 1) + (UPPERBOUND+1);//choose a random row position
+	fruit.yPos = rand() % ((RIGHTBOUND-1) - (LEFTBOUND+1) + 1) + (LEFTBOUND+1);//choose a random column position
+
+} // MD20241228-02 end definition of the pickLocation function
+
 //definition of function to add fruit
 void addFruit(){
 
 	//variable to control looping
 	int positionTaken = 1;
 
-	void pickLocation(){
-		
-		fruit.xPos = rand() % ((LOWERBOUND-1) - (UPPERBOUND+1) + 1) + (UPPERBOUND+1);//choose a random row position
-		fruit.yPos = rand() % ((RIGHTBOUND-1) - (LEFTBOUND+1) + 1) + (LEFTBOUND+1);//choose a random column position
-	
-	}
+
 	
 	//repeat picking a location and testing to see if the position is taken
 	while(positionTaken){
@@ -260,43 +263,49 @@ void addFruit(){
 
 }
 
+// MD20241228-03 moved the changePos funciton out of the moveSnake function
+//function to change the position to new location
+void changePos(int x, int y){
+
+	snake[0].xPos = x;
+
+	snake[0].yPos = y;
+
+} // MD20241228-04 end definition of the changePos function
+
+
+		
+// MD20241228-05 moved the updateOtherParts function out of the moveSnake function
+//function to update the trailling part positions and delete the last location
+void updateOtherParts(){
+	
+	
+	//if the trailling part isnt affecting borders
+	if( !((snake[lenght-1].yPos == LEFTBOUND) || (snake[lenght -1].yPos == RIGHTBOUND ) || ( snake[lenght - 1].xPos == UPPERBOUND) || (snake[lenght - 1].xPos == LOWERBOUND )) ){
+			
+		//delete the last trailling part
+		printf("\e7\e[%d;%dH\b \e8",snake[lenght-1].xPos, snake[lenght-1].yPos);
+
+
+	}
+
+	//for loop will shift all the snake parts up
+	for(int i = lenght; i > 0; i--){
+
+		snake[i].xPos = snake[i-1].xPos;
+		snake[i].yPos = snake[i-1].yPos;
+
+	}
+
+} // MD20241228-06 end definition of the updateOtherParts function
+
 //moves snake in give provided direction
 int moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){ 
 	
 	//check if enough time has passed since last movement
 	if( (float) (clock() - timeToMove)/CLOCKS_PER_SEC >= MOVEDELAY){
 		
-		//function to change the position to new location
-		void changePos(int x, int y){
 		
-			snake[0].xPos = x;
-
-			snake[0].yPos = y;
-		
-		}
-		
-		//function to update the trailling part positions and delete the last location
-		void updateOtherParts(){
-			
-			
-			//if the trailling part isnt affecting borders
-			if( !((snake[lenght-1].yPos == LEFTBOUND) || (snake[lenght -1].yPos == RIGHTBOUND ) || ( snake[lenght - 1].xPos == UPPERBOUND) || (snake[lenght - 1].xPos == LOWERBOUND )) ){
-					
-				//delete the last trailling part
-				printf("\e7\e[%d;%dH\b \e8",snake[lenght-1].xPos, snake[lenght-1].yPos);
-	
-
-			}
-
-			//for loop will shift all the snake parts up
-			for(int i = lenght; i > 0; i--){
-
-				snake[i].xPos = snake[i-1].xPos;
-				snake[i].yPos = snake[i-1].yPos;
-
-			}
-
-		}		
 
 		//rest the timer
 		timeToMove = clock();
@@ -391,7 +400,9 @@ int moveSnake(int direction, struct snakePart snake[MAXSNAKESIZE]){
 		}
 		
 	}
-}
+	// MD20241228-07 inserting retutn 0 call, as this function (moveSnake) is defined as retutning an int
+	return 0;
+} // MD20241228-08 end definition of the moveSnake function
 
 //definition of function to print program debugging stats
 void printDebugStats(int x, int y){
