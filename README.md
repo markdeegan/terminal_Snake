@@ -11,9 +11,9 @@ This repository is made to showcase the ability to control the terminal to behav
 ## Currently in the works
 The current tasks that are planned to implemented are as follows:
 * cross compiling to windows and linux distrbutions
-* create randomly generated fruits
-* collision detection with fruits and snake parts
 * colours for fruits and snakes
+* score system
+* global score system using MQTT protocol
 * [Next Steps](NextSteps.md)
 
 # Useful links
