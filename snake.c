@@ -18,6 +18,12 @@
 // MD20241229-04 custom snake error codes
 #include "errors.h"
 
+//definition of error exit code for getOriginalSettings()
+#define INIT_ERROR_SETTINGS 2 
+
+//definition of error exit code for enterRawMode()
+#define INIT_ERROR_RAW_MODE 3
+
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y);
 
@@ -68,15 +74,32 @@ int main(int argc, char** argv){
 	}
 
 	//call function to retrieve terminal settings and store in originalSettings platform dependent variable 
-	getOriginalSettings();
+	//check if the function failed
+	if(getOriginalSettings() == READ_FAIL){
+		
+		//print error out to terminal
+		fprintf("\e[31mgetOriginalSettings() failed to read stdin buffer!\e[m\n");
+		
+		//return with exit code related with getOriginalSettings failing
+		return INIT_ERROR_SETTINGS;
+
+	}
 	
 	//bind exitRawMode function on exit of program
 	atexit(exitRawMode);
 	
 	//call enterRawMode function to set the terminal to raw mode
-	enterRawMode();
+	//check if function failed
+	if(enterRawMode() == RAW_MODE_FAIL){
+		
+		//print error out to terminal
+		fprintf(stderr, "\e[31menterRawMode() failed to set terminal into raw mode!\e[m\n");
+		
+		//return exit code related with enterRawMode() failing
+		return INIT_ERROR_RAW_MODE;
 
-	//Matas - merged two printf function calls into one to reduces printf calls
+	}
+
 	//clear screen, move the cursor to 0,0 and make cursor invisible
 	printf("\e[2J\e[H\e[?25l");
 
@@ -92,7 +115,8 @@ int main(int argc, char** argv){
 
 	//create the trail parts of the snake
 	for(int i = 1; i < lenght;i++){
-	
+		
+		//set the snake part position to the right of 	
 		snake[i].xPos = snake[i-1].xPos;
 		snake[i].yPos = snake[i-1].yPos -1;
 	
@@ -100,7 +124,8 @@ int main(int argc, char** argv){
 
 	//initalise the clock timer for movement
 	timeToMove = clock();
-
+	
+	//call function to add a fruit to the game area
 	addFruit(snake, &fruit, lenght);
 
 	//start of game loop
@@ -108,9 +133,9 @@ int main(int argc, char** argv){
 
 		//definition of varible to store the time at the start of the frame
 		clock_t startTime = clock();
-
-		//unistd.h function to read the stdin buffer
-		int readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));
+		
+		//call function to read contents of stdin into passed buffer
+		intmax_t readSize = readTerminalInput(buffer);
 
 		//check if the read didn't fail or read nothing
 		if(!(readSize <= 0)){
@@ -124,16 +149,18 @@ int main(int argc, char** argv){
 			
 			//check if user pressed a vaild direction key and return direction
 			int newDirection = getDirection(buffer);
-
+			
+			//check if the direction is valid
 			if(!(newDirection == 0)){
 			
 				direction = newDirection;//set the new direction to the direction provided
 				
 			}
 
-		}else{//the read failed or nothing was inputted
-				
-			//continue snake movement in previous direction
+		}else if(readSize == READ_FAIL){//the read failed
+			
+			//print error out to terminal
+			fprintf(stderr, "\e[31mreadTerminalInput() failed to read stdin buffer");
 
 		}
 
@@ -142,7 +169,7 @@ int main(int argc, char** argv){
 			
 			//print out the debug stats
 			printDebugStats(snake,lenght,snake[0].xPos,snake[0].yPos);
-				
+			
 		}
 		
 
@@ -159,7 +186,7 @@ int main(int argc, char** argv){
 		}
 		
 
-		//wait till the frame rate is matched
+		//wait till the frame rate is matched (waits till new frame should be rendered)
 		while((float) FRAMERATE > (float) (clock() - startTime)/CLOCKS_PER_SEC );
 	
 	}
