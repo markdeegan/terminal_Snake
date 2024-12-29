@@ -393,5 +393,3 @@ void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int lenght){
 	}
 
 } // MD20241228-06 end definition of the updateOtherParts function
-
-
