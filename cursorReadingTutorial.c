@@ -22,20 +22,39 @@ void moveCursor(char key);
 int main(int argc, char** argv){
 		
 	//call function to store original terminal settings into platform dependent variables
-	getOriginalSettings();
+	//check if the function failed to execute
+	if(getOriginalSettings() == GET_SETTINGS_FAIL){
+		
+		//print the error out to terminal
+		fprintf(stderr,"\e[31mgetOriginalSettings failed to retrieve the terminal settings!\e[m\n");
+		
+		//return with exit code indicating getOriginalSettings() failed
+		return 1;
 
+	}
+	
 	//bind exit raw mode on exit
 	atexit(exitRawMode);
 
 	//function defined in terminalControl.h to enter raw mode
-	enterRawMode();	
+	//check if the function failed to execute
+	if(enterRawMode()){
+	
+		//print error out to terminal
+		fprintf(stderr,"\e[31menterRawMode() failed to set terminal into raw mode!\e[m\n");
+		
+		//return with exit code indicating enterRawMode() failed
+		return 2;
+
+	}	
 	
 	//clear the terminal display and move cursor to home
 	printf("\e[2J\e[H");
 	
 	//decleration of a read buffer to read the input stream
 	char readBuffer[4096];
-
+	
+	//decleration of variable used to break out of loop
 	int loopBreak = 0;
 	
 	//start of program loop
@@ -63,7 +82,7 @@ int main(int argc, char** argv){
 				readCursorPos(&x,&y);
 
 				//save cursor position, move to bottom of game area print the cursor pos and return to original position 	
-				printf("\e7\e[21;0H\e[Kx pos: %d, y pos: %d\e8",x,y);
+				printf("\e7\e[21;1H\e[Kx pos: %d, y pos: %d\e8",x,y);
 
 			}else{//the character is an escape character
 		
@@ -71,9 +90,15 @@ int main(int argc, char** argv){
 
 			}
 
-		}else{//nothing was read from the stdin
+		}else if(readSize <= 0){//nothing was read from the stdin
 		
+			//loop back to beginning
 			continue;
+		
+		}else if(readSize == READ_FAIL){//error occured on read
+			
+			//print error out to terminal
+			printf("\e7\e[21;1H\e[K\e[31mreadTerminalInput() failed to read stdin buffer!\e[m\e8");
 		
 		} 
 
