@@ -3,8 +3,21 @@
  * Purpose: Holds definitions of functions that control the terminal dependedent on the target platform.  
 */
 
-//standard c library to manipulate input and output
+//standard c header to manipulate input and output
 #include <stdio.h>
+
+//standard c header for int type definitions
+#include <stdint.h>
+
+#ifdef _WIN32_ //check for windows platform definition
+
+//windows header file
+#include <windows.h>
+
+HANDLE hstdin;//windows handle type to hold referance to stdin handle or file descriptor is POSIX
+DWORD fdwOriginalSettings;//windows dword type to hold old settings of console similar to termios structure
+
+#else //Non windows platform
 
 //POSIX c header for POSIX specific control
 #include <unistd.h>
@@ -15,6 +28,13 @@
 //POSIX c library used to communicate with kernel (used to get terminal width)
 #include <sys/ioctl.h>
 
+struct termios originalSettings;//variable to hold old terminal settings to reset to on exit of raw mode
+
+#endif
+
+//definition of error return code of readTerminalInput()
+#define READ_FAIL -1
+
 void getTerminalSize(){
 
 	struct winsize sz;//create an instance of structure winsize defined in ioctl.h
@@ -24,26 +44,149 @@ void getTerminalSize(){
 
 }
 
-//function to enter raw mode from concoical mode
-void enterRawMode(struct termios* originalSettings){
+//function to store the current terminal settings into target platform variable location
+void getOriginalSettings(){
+	
+	#ifdef _WIN32_//windows platform
 
-	//confgiures the standard out in no buffering mode
+		hstdin = getStdHandle(STD_INPUT_HANDLE);//retrieve the stdin handle
+		
+		//call getConsoleMode and perform error check 
+		if(! getConsoleMode(hstdin, fdwOriginalSettings) ){
+			
+			//print error out to terminal (debugging)
+			fprintf(stderr, "\e[31mError occured while trying to retrieve settings from stdin!\e[m\n");
+		
+		}
+
+	#else //POSIX platform
+	
+		//check if tcgetattr() failed
+		if (tcgetattr(STDIN_FILENO, &originalSettings) == -1){
+	
+			//print error out to terminal (debugging)
+			fprintf(stderr, "\e[31mError occured while trying to retrieve settings from stdin!\e[m\n");
+	
+		}	
+
+	#endif
+
+}
+
+//function to enter raw mode from concoical mode
+void enterRawMode(){
+	
+	//configure the stdout in no buffering mode
 	setvbuf(stdout, NULL, _IONBF, 0);
 
-	//set the raw settings to the defernaced old settings
-	struct termios raw = *originalSettings;
+	#ifdef _WIN32_ //windows platform rawMode
 
-	//enable polling mode ()
-	raw.c_cc[VTIME] = 0;//set timeout time for raw mode to 0 ns
-	raw.c_cc[VMIN] = 0;//set minimum read characters to 0
+		//use bit wise operators to set terminal flags
+		//ENABLE_ECHO_INPUT: controls if the input is echoed back to console
+		//ENABLE_LINE_INPUT: controls if buffer read yields until new line escape sequence is passed similar to (ICANON)
 
-	//use bit wise operators to disable the ICANON and ECHO flags
-	//ECH0: control flag to enable stdin echo or not
-	//ICANON: Configures terminal in cononical mode or nonconoical (raw) mode if disabled
-	raw.c_lflag &= ~(ECHO | ICANON);
+		DWORD fdwRaw = ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT)	
+		
+		//check if setConsoleMode failed to set the terminal settings in raw mode
+		if(!setConsoleMode(hstdin,fdwRaw)){
+		
+			//print error message out to terminal
+			fprintf(stderr, "\e[31msetConsole() failed to set terminal in raw mode!\e[m\n");
+		}
+
+	#else //POSIX platform rawMode
+
+		//set the raw settings to the defernaced old settings
+		struct termios raw = originalSettings;
+
+		//enable polling mode
+		raw.c_cc[VTIME] = 0;//set timeout time for raw mode to 0 ns
+		raw.c_cc[VMIN] = 0;//set minimum read characters to 0
+
+		//use bit wise operators to disable the ICANON and ECHO flags
+		//ECH0: control flag to enable stdin echo or not
+		//ICANON: Configures terminal in cononical mode or nonconoical (raw) mode if disabled
+		raw.c_lflag &= ~(ECHO | ICANON);
 	
-	//set the terminal to the raw mode settings
-	tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+		//set the terminal to the raw mode settings
+		tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+
+	#endif
+
+}
+
+//function to exit raw mode
+void exitRawMode(){
+
+	#ifdef _WIN32_ //windows platform
+		
+		//check if resetting terminal settings failed
+		if ( ! setConsoleMode(hstdin,fdwOriginalSettings) ){
+			
+			//print error message out to terminal (debugging)
+			fprintf(stderr, "\e[31msetConsoleMode() failed to reset terminal settings to original settings!\e[m");
+		
+		}
+
+	#else // POSIX platform
+
+		//check if resetting terminal settings failed
+		if(tcsetattr(STDIN_FILENO, TCSANOW, &originalSettings) == -1){
+			
+			//print error message out to terminal (debugging)
+			fprintf(stderr, "\e[31mtcsetattr() failed to reset terminal settings to original settings!\e[m");
+		
+		}
+
+	#endif
+
+}
+
+//function to read from terminal input buffer independent of platform
+//returns the read size as max int size in current system to avoid conflict with ssize_t on other platforms 
+intmax_t readTerminalInput(char buffer[4096]){
+	
+	#ifdef _WIN32_ //windows platform
+		
+		//decleration of readSize variable
+		LPDWORD readSize;
+		
+		//check if read from stdin failed
+		if(! readConsole(hstdin,buffer, 4096, &readSize, NULL)){
+		
+			//print error out to terminal
+			fprintf(stderr, "\e[31mreadConsole() failed to read from stdin!\e[m");
+			
+			//return failed read exit code
+			return READ_FAIL;
+		
+		}
+		
+		//return the readSize typecasted to max int size on system
+		return (intmax_t) readSize;
+
+	#else //POSIX platform
+		
+		//decleration of readSize variable
+		ssize_t readSize;
+		
+		//assign readSize to the return of read()
+		readSize = read(STDIN_FILENO, buffer, 4096);
+		
+		//check if read() failed
+		if(readSize == -1){
+			
+			//print error out to terminal
+			fprintf(stderr, "\e[31mread() failed to read from stdin!\e[m\n");
+			
+			//return the exit code for a failed read
+			return READ_FAIL;
+		}
+		
+		//return the readSize typcasted to max int size on system
+		return (intmax_t) readSize;
+
+	#endif
 
 }
 

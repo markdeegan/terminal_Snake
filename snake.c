@@ -18,12 +18,6 @@
 // MD20241229-04 custom snake error codes
 #include "errors.h"
 
-//decleration of variable to store old terminal settings
-struct termios original_Settings;
-
-//decleration of exit raw mode function to prevent complier errors
-void exitRawMode(void);
-
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y);
 
@@ -73,14 +67,14 @@ int main(int argc, char** argv){
 
 	}
 
-	//store the current terminal settings into the original settings variable
-	tcgetattr(STDIN_FILENO, &original_Settings);
+	//call function to retrieve terminal settings and store in originalSettings platform dependent variable 
+	getOriginalSettings();
 	
 	//bind exitRawMode function on exit of program
 	atexit(exitRawMode);
 	
 	//call enterRawMode function to set the terminal to raw mode
-	enterRawMode(&original_Settings);
+	enterRawMode();
 
 	//Matas - merged two printf function calls into one to reduces printf calls
 	//clear screen, move the cursor to 0,0 and make cursor invisible
@@ -178,14 +172,6 @@ int main(int argc, char** argv){
 	//exit with error code 0 to indicate successful completion of program
 
 } // MD20241229-03 end definition of main method
-
-//definition of exit raw mode function 
-void exitRawMode(void){
-
-	//set terminal to old saved settings
-	tcsetattr(STDIN_FILENO, TCSANOW, &original_Settings);
-
-}
 
 //definition of function to print program debugging stats
 void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y){
