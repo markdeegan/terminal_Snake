@@ -123,7 +123,7 @@ int getOriginalSettings(){
 		//retrieve the stdout handle
 		HANDLE hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
 		
-		DWORD fdwOutputFlags = (ENABLE_WINDOW_INPUT & ENABLE_VIRTUAL_TERMINAL_INPUT ) & ~(ENABLE_LINE_INPUT);
+		DWORD fdwOutputFlags = (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN);
 
 		if(!SetConsoleMode(hstdout,fdwOutputFlags)){
 			
