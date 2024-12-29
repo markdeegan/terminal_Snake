@@ -201,30 +201,23 @@ intmax_t readTerminalInput(char buffer[4096]){
 //function to use ANSI escape codes to retrieve the cursor position
 void readCursorPos(int*x, int* y){
 	
-	#ifdef _WIN32//windows platform
-
-		//code to be yet added for windows
-
-	#else//POSIX platform
-
-		char buffer[4096];//read buffer with the size of stdin buffer
-
-		ssize_t readSize;//variable to store the read size of read()
-
-		write(STDOUT_FILENO,"\e[6n",4);//request cursor position (will be reported back to stdin)
+	//decleration of readBuffer
+	char buffer[4096];
 	
-		readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));//call function to read the stdin into buffer
-	
-		//we repeatedly read until report is sent back (there is a slight delay on the messaging)
-		while((readSize <= 0)){
-	
-			readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));
-	
-		}
-		
-		//do a formatted scan of buffer and retrieve the x and y position of the cursor
-		sscanf(buffer, "\e[%d;%dR", x, y);
+	intmax_t readSize = readTerminalInput(buffer);
 
-	#endif	
+	//request cursor position report
+	printf("\e[6n");
+
+	//while nothing is read
+	while((readSize <= 0)){
+	
+		//continue reading input buffer
+		readSize = readTerminalInput(buffer);
+	
+	}
+	
+	//use a formatted scan of buffer and retrieve x and y position of the cursor report
+	sscanf(buffer, "\e[%d;%dR",x,y);	
 			
 }

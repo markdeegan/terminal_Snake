@@ -15,29 +15,20 @@
 //macro definiton for character used to escape program loop
 #define ESCAPECHAR 'q'
 
-//decleration of termios type variable to store old terminal settings prior raw mode
-struct termios originalSettings;
-
-//decleration of function to exit raw mode
-void exitRawMode(void);
-
 //decleration of function to read user key input 
 void moveCursor(char key);
 
 //start of main method
 int main(int argc, char** argv){
 		
-	//retrieve the current terminal settings
-	tcgetattr(STDIN_FILENO, &originalSettings);
+	//call function to store original terminal settings into platform dependent variables
+	getOriginalSettings();
 
 	//bind exit raw mode on exit
 	atexit(exitRawMode);
 
 	//function defined in terminalControl.h to enter raw mode
-	enterRawMode(&originalSettings);
-
-	//disable buffering in the output stream
-	//setvbuf(stdout, NULL, _IONBF, 0);	
+	enterRawMode(&originalSettings);	
 	
 	//clear the terminal display and move cursor to home
 	printf("\e[2J\e[H");
@@ -46,32 +37,15 @@ int main(int argc, char** argv){
 	char readBuffer[4096];
 
 	int loopBreak = 0;
-
-	//print the below content with white background
-	printf("\e[47m");
 	
-	for(int i = 0; i < 20; i++){
-	
-		for(int j = 0; j < 40; j++){
-		
-			printf(" ");
-		
-		}
-
-		printf("\n");
-	
-	}
-
-	//end the white background control and return cursor to position 1,1
-	printf("\e[m\e[1;1H");
-
 	//start of program loop
 	while(!loopBreak){
 		
+		//flush our readBuffer before read to prevent left over memeory		
 		memset(readBuffer,0,sizeof(readBuffer));
 
 		//read the contents of stdin buffer
-		ssize_t readSize = read(STDIN_FILENO, &readBuffer, sizeof(readBuffer));	
+		intmax_t readSize = readTerminalInput(readBuffer);	
 		
 		//check if the buffer read something
 		if( readSize > 0 ){
@@ -83,36 +57,30 @@ int main(int argc, char** argv){
 				moveCursor(readBuffer[0]);
 				
 				//variables to store x and y positions of cursor
-				//int x,y;	
+				int x,y;	
 				
 				//call function to request for cursor position
-				//readCursorPos(&x,&y);
+				readCursorPos(&x,&y);
 
 				//save cursor position, move to bottom of game area print the cursor pos and return to original position 	
-				//printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
+				printf("\e7\e[21;0H\e[Kx pos: %d, y pos: %d\e8",x,y);
 
 			}else{//the character is an escape character
 		
 				loopBreak = 1;//break the while loop	
 
 			}
+
 		}else{//nothing was read from the stdin
 		
 			continue;
 		
 		} 
-		
-		int x,y;
-
-		readCursorPos(&x,&y);
-
-		printf("\e[s\e[21;0H\e[Kx pos: %d, y pos: %d\e[u",x,y);
-
 
 	}
 	
-	//move cursor to a unused line 
-	printf("\e[22;1H");
+	//clear output buffer and move cursor to home 
+	printf("\e[2J\e[H");
 
 	return 0;//return 0 indicating successful completion of program
 
@@ -168,10 +136,4 @@ void moveCursor(char key){
 
 }
 
-//definition of exitRawMode function
-void exitRawMode(void){
 
-	//set the terminal to the old settings
-	tcsetattr(STDIN_FILENO, TCSANOW, &originalSettings);
-
-}
