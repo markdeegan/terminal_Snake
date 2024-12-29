@@ -36,11 +36,19 @@ struct termios originalSettings;//variable to hold old terminal settings to rese
 #define READ_FAIL -1
 
 void getTerminalSize(){
+	
+	#ifdef _WIN32//windows platform
 
-	struct winsize sz;//create an instance of structure winsize defined in ioctl.h
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &sz);
+		//code to be yet added
 
-	printf("x size: %d, y size: %d\n",sz.ws_row,sz.ws_col);//print out the size retrieved
+	#else//POSIX platform
+
+		struct winsize sz;//create an instance of structure winsize defined in ioctl.h
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &sz);
+
+		printf("x size: %d, y size: %d\n",sz.ws_row,sz.ws_col);//print out the size retrieved
+
+	#endif
 
 }
 
@@ -49,10 +57,10 @@ void getOriginalSettings(){
 	
 	#ifdef _WIN32//windows platform
 
-		hstdin = getStdHandle(STD_INPUT_HANDLE);//retrieve the stdin handle
+		hstdin = GetStdHandle(STD_INPUT_HANDLE);//retrieve the stdin handle
 		
 		//call getConsoleMode and perform error check 
-		if(! getConsoleMode(hstdin, fdwOriginalSettings) ){
+		if(! GetConsoleMode(hstdin, fdwOriginalSettings) ){
 			
 			//print error out to terminal (debugging)
 			fprintf(stderr, "\e[31mError occured while trying to retrieve settings from stdin!\e[m\n");
@@ -88,7 +96,7 @@ void enterRawMode(){
 		DWORD fdwRaw = ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT)	
 		
 		//check if setConsoleMode failed to set the terminal settings in raw mode
-		if(!setConsoleMode(hstdin,fdwRaw)){
+		if(!SetConsoleMode(hstdin,fdwRaw)){
 		
 			//print error message out to terminal
 			fprintf(stderr, "\e[31msetConsole() failed to set terminal in raw mode!\e[m\n");
@@ -121,7 +129,7 @@ void exitRawMode(){
 	#ifdef _WIN32 //windows platform
 		
 		//check if resetting terminal settings failed
-		if ( ! setConsoleMode(hstdin,fdwOriginalSettings) ){
+		if ( ! SetConsoleMode(hstdin,fdwOriginalSettings) ){
 			
 			//print error message out to terminal (debugging)
 			fprintf(stderr, "\e[31msetConsoleMode() failed to reset terminal settings to original settings!\e[m");
@@ -152,7 +160,7 @@ intmax_t readTerminalInput(char buffer[4096]){
 		LPDWORD readSize;
 		
 		//check if read from stdin failed
-		if(! readConsole(hstdin,buffer, 4096, &readSize, NULL)){
+		if(! ReadConsole(hstdin,buffer, 4096, &readSize, NULL)){
 		
 			//print error out to terminal
 			fprintf(stderr, "\e[31mreadConsole() failed to read from stdin!\e[m");
@@ -192,23 +200,31 @@ intmax_t readTerminalInput(char buffer[4096]){
 
 //function to use ANSI escape codes to retrieve the cursor position
 void readCursorPos(int*x, int* y){
+	
+	#ifdef _WIN32//windows platform
 
-	char buffer[4096];//read buffer with the size of stdin buffer
+		//code to be yet added for windows
 
-	ssize_t readSize;//variable to store the read size of read()
+	#else//POSIX platform
 
-	write(STDOUT_FILENO,"\e[6n",4);//request cursor position (will be reported back to stdin)
+		char buffer[4096];//read buffer with the size of stdin buffer
+
+		ssize_t readSize;//variable to store the read size of read()
+
+		write(STDOUT_FILENO,"\e[6n",4);//request cursor position (will be reported back to stdin)
 	
-	readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));//call function to read the stdin into buffer
+		readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));//call function to read the stdin into buffer
 	
-	//we repeatedly read until report is sent back (there is a slight delay on the messaging)
-	while((readSize <= 0)){
+		//we repeatedly read until report is sent back (there is a slight delay on the messaging)
+		while((readSize <= 0)){
 	
-		readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));
+			readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));
 	
-	}
+		}
 		
-	//do a formatted scan of buffer and retrieve the x and y position of the cursor
-	sscanf(buffer, "\e[%d;%dR", x, y);	
+		//do a formatted scan of buffer and retrieve the x and y position of the cursor
+		sscanf(buffer, "\e[%d;%dR", x, y);
+
+	#endif	
 			
 }
