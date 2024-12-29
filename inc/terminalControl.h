@@ -9,7 +9,7 @@
 //standard c header for int type definitions
 #include <stdint.h>
 
-#ifdef _WIN32_ //check for windows platform definition
+#ifdef _WIN32 //check for windows platform definition
 
 //windows header file
 #include <windows.h>
@@ -47,7 +47,7 @@ void getTerminalSize(){
 //function to store the current terminal settings into target platform variable location
 void getOriginalSettings(){
 	
-	#ifdef _WIN32_//windows platform
+	#ifdef _WIN32//windows platform
 
 		hstdin = getStdHandle(STD_INPUT_HANDLE);//retrieve the stdin handle
 		
@@ -79,7 +79,7 @@ void enterRawMode(){
 	//configure the stdout in no buffering mode
 	setvbuf(stdout, NULL, _IONBF, 0);
 
-	#ifdef _WIN32_ //windows platform rawMode
+	#ifdef _WIN32 //windows platform rawMode
 
 		//use bit wise operators to set terminal flags
 		//ENABLE_ECHO_INPUT: controls if the input is echoed back to console
@@ -118,7 +118,7 @@ void enterRawMode(){
 //function to exit raw mode
 void exitRawMode(){
 
-	#ifdef _WIN32_ //windows platform
+	#ifdef _WIN32 //windows platform
 		
 		//check if resetting terminal settings failed
 		if ( ! setConsoleMode(hstdin,fdwOriginalSettings) ){
@@ -146,7 +146,7 @@ void exitRawMode(){
 //returns the read size as max int size in current system to avoid conflict with ssize_t on other platforms 
 intmax_t readTerminalInput(char buffer[4096]){
 	
-	#ifdef _WIN32_ //windows platform
+	#ifdef _WIN32 //windows platform
 		
 		//decleration of readSize variable
 		LPDWORD readSize;
