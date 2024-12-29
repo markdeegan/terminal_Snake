@@ -159,8 +159,11 @@ intmax_t readTerminalInput(char buffer[4096]){
 		//decleration of readSize variable
 		DWORD readSize;
 		
-		//check if read from stdin failed
-		if(! ReadConsole(hstdin,buffer, 4096, &readSize, NULL)){
+		//attempt to read stdin into buffer
+		ReadConsole(hstdin,buffer, 4096, &readSize, NULL);
+
+		//check if read from stdin failed by getting the last exit return code
+		if(GetLastError()){
 		
 			//print error out to terminal
 			fprintf(stderr, "\e[31mreadConsole() failed to read from stdin!\e[m");
