@@ -1,5 +1,0 @@
-{
-    "cmake.buildDirectory": "${workspaceFolder}/bin",
-    "makefile.makefilePath": ".\\makefile",
-    "makefile.makePath": ""
-}
