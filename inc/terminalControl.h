@@ -132,7 +132,7 @@ void exitRawMode(){
 		if ( ! SetConsoleMode(hstdin,fdwOriginalSettings) ){
 			
 			//print error message out to terminal (debugging)
-			fprintf(stderr, "\e[31msetConsoleMode() failed to reset terminal settings to original settings!\e[m");
+			fprintf(stderr, "\e[31msetConsoleMode() failed to reset terminal settings to original settings!\e[m\n");
 		
 		}
 
@@ -142,7 +142,7 @@ void exitRawMode(){
 		if(tcsetattr(STDIN_FILENO, TCSANOW, &originalSettings) == -1){
 			
 			//print error message out to terminal (debugging)
-			fprintf(stderr, "\e[31mtcsetattr() failed to reset terminal settings to original settings!\e[m");
+			fprintf(stderr, "\e[31mtcsetattr() failed to reset terminal settings to original settings!\e[m\n");
 		
 		}
 
@@ -163,10 +163,10 @@ intmax_t readTerminalInput(char buffer[4096]){
 		ReadConsole(hstdin,buffer, 4096, &readSize, NULL);
 
 		//check if read from stdin failed by getting the last exit return code
-		if(GetLastError()){
+		if(GetLastError() != 0){
 		
 			//print error out to terminal
-			fprintf(stderr, "\e[31mreadConsole() failed to read from stdin!\e[m");
+			fprintf(stderr, "\e[31mreadConsole() failed to read from stdin!\e[m\n");
 			
 			//return failed read exit code
 			return READ_FAIL;
