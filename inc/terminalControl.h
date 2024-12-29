@@ -54,6 +54,9 @@
 //definition of error return code of readCursorPos() when sscanf() fails to read buffer data
 #define GET_POS_FAIL -6
 
+//definition of error return code of getOriginalSettings() while trying to set output buffer conditions
+#define SET_OUTPUT_FAIL -7
+
 //function to return the terminal row & column size
 int getTerminalSize(int* x, int* y){
 	
