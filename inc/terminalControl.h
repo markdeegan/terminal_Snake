@@ -32,28 +32,88 @@
 
 #endif
 
+//definition of success return code of all functions in header
+//added prefix TERMINALCONTROL to avoid conflict with other definitions of success
+#define TERMINALCONTROLSUCCESS 0
+
 //definition of error return code of readTerminalInput()
 #define READ_FAIL -1
 
-void getTerminalSize(){
+//definition of error return code of getTerminalSize()
+#define GET_SIZE_FAIL -2
+
+//definition of error return code of enterRawMode()
+#define RAW_MODE_FAIL -3
+
+//definition of error return code of getOriginalSettings()
+#define GET_SETTINGS_FAIL -4
+
+//definition of error return code of readCursorPos() when readTerminalInput() fails
+#define GET_POS_READ_FAIL -5
+
+//definition of error return code of readCursorPos() when sscanf() fails to read buffer data
+#define GET_POS_FAIL -6
+
+//function to return the terminal row & column size
+int getTerminalSize(int* x, int* y){
 	
 	#ifdef _WIN32//windows platform
+		
+		//decleratrion for stdout handle
+		HANDLE hstdout;
+		
+		//decleration for the buffer infromation returned 
+		CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
 
-		//code to be yet added
+		//retrieve the handle for stdout
+		hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
+
+		//call function to retrieve the consoles screen buffer infromation
+		if(!GetConsoleScreenBufferInfo(hstdout, &consoleInfo)){
+		
+			//print error out to terminal
+			fprintf(stderr, "\e[31mGetConsoleScreenBufferInfo() failed to retrieve screen info!\e[m\n");
+			
+			//return out of function
+			return GET_SIZE_FAIL;
+
+		}
+		
+		//store the result into the dereferanced passed arguments
+		*x = (int) consoleInfo.dwSize.X;
+		*y = (int) consoleInfo.dwSize.Y;
+		
+		//return an exit code indicating success
+		return TERMINALCONTROLSUCCESS;
 
 	#else//POSIX platform
 
 		struct winsize sz;//create an instance of structure winsize defined in ioctl.h
-		ioctl(STDOUT_FILENO, TIOCGWINSZ, &sz);
+		
+		//check if the ioctl() failed
+		if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &sz) == -1){
+			
+			//print error out to terminal
+			fprintf(stderr, "\e[31mioctl() failed to retrieve screen info!\e[m\n");
+			
+			//return with exit code indicating failed window size request
+			return GET_SIZE_FAIL;
 
-		printf("x size: %d, y size: %d\n",sz.ws_row,sz.ws_col);//print out the size retrieved
-
+		}
+		
+		//store the result into dereferanced passed arguments
+		*x = sz.ws_row;
+		*y = sz.ws_col;
+		
+		//return with exit code indicating success
+		return TERMINALCONTROLSUCCESS;
+		
 	#endif
 
 }
 
 //function to store the current terminal settings into target platform variable location
-void getOriginalSettings(){
+int getOriginalSettings(){
 	
 	#ifdef _WIN32//windows platform
 
@@ -64,8 +124,14 @@ void getOriginalSettings(){
 			
 			//print error out to terminal (debugging)
 			fprintf(stderr, "\e[31mError occured while trying to retrieve settings from stdin!\e[m\n");
-		
+			
+			//return with exit code indicating failed retrieval of terminal settings
+			return GET_SETTINGS_FAIL;
+
 		}
+
+		//return with exit code indicating successful retrieval of terminal settings
+		return TERMINALCONTROLSUCCESS;
 
 	#else //POSIX platform
 	
@@ -74,15 +140,21 @@ void getOriginalSettings(){
 	
 			//print error out to terminal (debugging)
 			fprintf(stderr, "\e[31mError occured while trying to retrieve settings from stdin!\e[m\n");
-	
+			
+			//return with exit code indicating failed retreival of terminal settings
+			return GET_SETTINGS_FAIL;
+
 		}	
+		
+		//return with exit code indicating successful retrieval of terminal settings
+		return TERMINALCONTROLSUCCESS;
 
 	#endif
 
 }
 
 //function to enter raw mode from concoical mode
-void enterRawMode(){
+int enterRawMode(){
 	
 	//configure the stdout in no buffering mode
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -100,7 +172,14 @@ void enterRawMode(){
 		
 			//print error message out to terminal
 			fprintf(stderr, "\e[31msetConsole() failed to set terminal in raw mode!\e[m\n");
+			
+			//return with exit code indicating failed to enter raw mode
+			return RAW_MODE_FAIL;
+
 		}
+		
+		//return with exit code indicating success to enter raw mode
+		return TERMINALCONTROLSUCCESS;
 
 	#else //POSIX platform rawMode
 
@@ -117,13 +196,25 @@ void enterRawMode(){
 		raw.c_lflag &= ~(ECHO | ICANON);
 	
 		//set the terminal to the raw mode settings
-		tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+		if(tcsetattr(STDIN_FILENO, TCSANOW, &raw) == -1){
+			
+			//print error out to terminal
+			fprintf(stderr,"\e[31mtcsetattr() failed to set terminal into raw mode!\e[m\n");
+			
+			//return exit code indicating function failed to enter terminal into raw mode
+			return RAW_MODE_FAIL;
+
+		}
+		
+		//return with exit code indicating success to enter raw mode
+		return TERMINALCONTROLSUCCESS;
 
 	#endif
 
 }
 
 //function to exit raw mode
+//no return can be set due to this function usually being binded to atexit()
 void exitRawMode(){
 
 	#ifdef _WIN32 //windows platform
@@ -199,7 +290,7 @@ intmax_t readTerminalInput(char buffer[4096]){
 }
 
 //function to use ANSI escape codes to retrieve the cursor position
-void readCursorPos(int*x, int* y){
+int readCursorPos(int*x, int* y){
 	
 	//decleration of readBuffer
 	char buffer[4096];
@@ -209,16 +300,49 @@ void readCursorPos(int*x, int* y){
 
 	//read cursor position sent to stdin buffer
 	intmax_t readSize = readTerminalInput(buffer);
+	
+	//check if reading the stdin buffer failed
+	if(readSize == READ_FAIL){
+		
+		//print error out to terminal
+		fprintf(stderr,"\e[31mreadTerminalInput() failed to read stdin buffer!\e[m\n");
+		
+		//return with exit code indicating readTerminalInput() failed within readCursorPos()
+		return GET_POS_READ_FAIL;
 
-	//while nothing is read
+	}
+
+	//while nothing is read (there is a minor delay from reporting to recieving)
 	while((readSize <= 0)){
 	
 		//continue reading input buffer
 		readSize = readTerminalInput(buffer);
-	
+		
+		//check if reading the stdin buffer failed
+		if(readSize == READ_FAIL){
+		
+			//print error out to terminal
+			fprintf(stderr,"\e[31mreadTerminalInput() failed to read stdin buffer!\e[m\n");
+		
+			//return with exit code indicating readTerminalInput() failed within readCursorPos()
+			return GET_POS_READ_FAIL;
+
+		}	
+
 	}
 	
-	//use a formatted scan of buffer and retrieve x and y position of the cursor report
-	sscanf(buffer, "\e[%d;%dR",x,y);	
-			
+	//check if the sscanf failed due to buffer data
+	if(sscanf(buffer, "\e[%d;%dR",x,y) == EOF){
+	
+		//print message out to terminal
+		fprintf(stderr,"\e[31msscanf() failed to read data from buffer!\e[m\n");
+
+		//return with exit code indicating the sscanf() failed to read buffer
+		return GET_POS_FAIL;
+	
+	}	
+	
+	//return exit code indicating success on retrieving cursor position
+	return TERMINALCONTROLSUCCESS;
+
 }
