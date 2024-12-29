@@ -116,6 +116,23 @@ int getTerminalSize(int* x, int* y){
 int getOriginalSettings(){
 	
 	#ifdef _WIN32//windows platform
+		
+		//retrieve the stdout handle
+		HANDLE hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
+		
+		DWORD fdwOutputFlags = (ENABLE_WINDOW_INPUT & ENABLE_VIRTUAL_TERMINAL_INPUT ) & ~(ENABLE_LINE_INPUT);
+
+		if(!SetConsoleMode(hstdout,fdwOutputFlags)){
+			
+			DWORD errNum = GetLastError();
+			
+			//print error to terminal
+			fprintf(stderr, "\e[31mError occured while trying to set stdout buffer settings!\e[m\n");
+			
+			//return with exit code related to setting output buffer configurations
+			return SET_OUTPUT_FAIL;
+
+		}
 
 		hstdin = GetStdHandle(STD_INPUT_HANDLE);//retrieve the stdin handle
 		
