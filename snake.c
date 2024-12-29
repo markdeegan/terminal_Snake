@@ -75,7 +75,7 @@ int main(int argc, char** argv){
 
 	//call function to retrieve terminal settings and store in originalSettings platform dependent variable 
 	//check if the function failed
-	if(getOriginalSettings() == READ_FAIL){
+	if(getOriginalSettings() == GET_SETTINGS_FAIL){
 		
 		//print error out to terminal
 		fprintf(stderr,"\e[31mgetOriginalSettings() failed to read stdin buffer!\e[m\n");
