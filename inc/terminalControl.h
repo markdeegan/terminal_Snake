@@ -171,9 +171,12 @@ int enterRawMode(){
 		
 		//check if setConsoleMode failed to set the terminal settings in raw mode
 		if(!SetConsoleMode(hstdin,fdwRaw)){
-		
+			
+			//retrieve last error from setConsoleMode()
+			DWORD errNum = GetLastError();
+
 			//print error message out to terminal
-			fprintf(stderr, "\e[31msetConsole() failed to set terminal in raw mode!\e[m\n");
+			fprintf(stderr, "\e[31msetConsole() failed to set terminal in raw mode! error code: %d\e[m\n", errNum);
 			
 			//return with exit code indicating failed to enter raw mode
 			return RAW_MODE_FAIL;
