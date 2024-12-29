@@ -16,13 +16,30 @@
 int main(int argc, char** argv){	
 	
 	//get the originalSettings and store on platform specific originalSettings variables
-	getOriginalSettings();
+	//check if the function failed
+	if(getOriginalSettings() == GET_SETTINGS_FAIL){
+		
+		//print error out to terminal
+		fprintf(stderr,"\e[31mgetOriginalSettings() failed to retrieve terminal settings!\e[m\n");
+		
+		//return with exit code indicating getOriginalSettings() failed
+		return 1;
+
+	}
 	
 	//bind the exitRawMode fuction on exit of this main method (resets terminal to orignal settings)
 	atexit(exitRawMode);
 
 	//call the function to enter raw mode
-	enterRawMode();
+	if(enterRawMode() == RAW_MODE_FAIL){
+	
+		//print error out to terminal
+		fprintf(stderr,"\e[31menterRawMode() failed to set terminal into raw mode!\e[m\n");
+	
+		//return with exit code indicating enterRawMode() failed
+		return 2;
+
+	}
 
 	//loop break variable to stop read loop
 	int exitCondition = 0;
@@ -36,11 +53,18 @@ int main(int argc, char** argv){
 		intmax_t readSize = readTerminalInput(buffer);	
 		
 		//check if the stdin buffer has no content or failed
-		if(readSize <= 0){
+		if(readSize == 0){
 			
 			//we skip that read cycle
 			continue;
 		
+		}else if(readSize == READ_FAIL){//check if function failed
+			
+			//print error out to terminal	
+			printf("\e[31mreadTerminalInput() failed to read stdin buffer!\e[m\n");
+			
+			//we loop back to start of loop
+			continue;
 		}
 
 		//loop through all characters that were read and print them in line
