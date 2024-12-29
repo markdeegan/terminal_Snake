@@ -167,7 +167,7 @@ int enterRawMode(){
 		//ENABLE_ECHO_INPUT: controls if the input is echoed back to console
 		//ENABLE_LINE_INPUT: controls if buffer read yields until new line escape sequence is passed similar to (ICANON)
 
-		DWORD fdwRaw = ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);	
+		DWORD fdwRaw &= ~( ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT );	
 		
 		//check if setConsoleMode failed to set the terminal settings in raw mode
 		if(!SetConsoleMode(hstdin,fdwRaw)){
