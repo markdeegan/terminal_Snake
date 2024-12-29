@@ -122,7 +122,7 @@ int getOriginalSettings(){
 		//call getConsoleMode and perform error check 
 		if(! GetConsoleMode(hstdin, &fdwOriginalSettings) ){
 			
-			DWORD errNum = GETLastError(); 
+			DWORD errNum = GetLastError(); 
 
 			//print error out to terminal (debugging)
 			fprintf(stderr, "\e[31mError occured while trying to retrieve settings from stdin! code: %d\e[m\n", errNum);		
