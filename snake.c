@@ -15,6 +15,9 @@
 //custom snake game header
 #include "inc/snake.h"
 
+// MD20241229-04 custom snake error codes
+#include "errors.h"
+
 //decleration of variable to store old terminal settings
 struct termios original_Settings;
 
@@ -24,7 +27,7 @@ void exitRawMode(void);
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y);
 
-//start of main method
+//start definition of main method
 int main(int argc, char** argv){
 	
 	//defines if the game is ran in debugging mode (infromation printed on screen)
@@ -170,9 +173,11 @@ int main(int argc, char** argv){
 	printf("\e[%d;0HUpper: %d, lower: %d, left: %d, right: %d\n", LOWERBOUND + 3, UPPERBOUND, LOWERBOUND, LEFTBOUND, RIGHTBOUND);
 	printf("\e[?25h\e[%d;0H",LOWERBOUND+4);//returns cursor to out of bound area of game space and make it visible again
 
-	return 0;//exit with error code 0 to indicate successful completion of program
+	return SNAKE_SUCCESS;
+	// MD20241229-04 changes return code from 0 to SNAKE_SUCCESS
+	//exit with error code 0 to indicate successful completion of program
 
-}
+} // MD20241229-03 end definition of main method
 
 //definition of exit raw mode function 
 void exitRawMode(void){
