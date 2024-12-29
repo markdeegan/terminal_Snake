@@ -78,7 +78,7 @@ int main(int argc, char** argv){
 	if(getOriginalSettings() == READ_FAIL){
 		
 		//print error out to terminal
-		fprintf("\e[31mgetOriginalSettings() failed to read stdin buffer!\e[m\n");
+		fprintf(stderr,"\e[31mgetOriginalSettings() failed to read stdin buffer!\e[m\n");
 		
 		//return with exit code related with getOriginalSettings failing
 		return INIT_ERROR_SETTINGS;
