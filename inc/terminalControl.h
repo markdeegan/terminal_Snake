@@ -11,24 +11,24 @@
 
 #ifdef _WIN32 //check for windows platform definition
 
-//windows header file
-#include <windows.h>
+	//windows header file
+	#include <windows.h>
 
-HANDLE hstdin;//windows handle type to hold referance to stdin handle or file descriptor is POSIX
-DWORD fdwOriginalSettings;//windows dword type to hold old settings of console similar to termios structure
+	HANDLE hstdin;//windows handle type to hold referance to stdin handle or file descriptor is POSIX
+	DWORD fdwOriginalSettings;//windows dword type to hold old settings of console similar to termios structure
 
 #else //Non windows platform
 
-//POSIX c header for POSIX specific control
-#include <unistd.h>
+	//POSIX c header for POSIX specific control
+	#include <unistd.h>
 
-//POSIX c library to control the terminal settings and behaviour
-#include <termios.h>
+	//POSIX c library to control the terminal settings and behaviour
+	#include <termios.h>
 
-//POSIX c library used to communicate with kernel (used to get terminal width)
-#include <sys/ioctl.h>
+	//POSIX c library used to communicate with kernel (used to get terminal width)
+	#include <sys/ioctl.h>
 
-struct termios originalSettings;//variable to hold old terminal settings to reset to on exit of raw mode
+	struct termios originalSettings;//variable to hold old terminal settings to reset to on exit of raw mode
 
 #endif
 
@@ -60,7 +60,7 @@ void getOriginalSettings(){
 		hstdin = GetStdHandle(STD_INPUT_HANDLE);//retrieve the stdin handle
 		
 		//call getConsoleMode and perform error check 
-		if(! GetConsoleMode(hstdin, fdwOriginalSettings) ){
+		if(! GetConsoleMode(hstdin, &fdwOriginalSettings) ){
 			
 			//print error out to terminal (debugging)
 			fprintf(stderr, "\e[31mError occured while trying to retrieve settings from stdin!\e[m\n");
@@ -93,7 +93,7 @@ void enterRawMode(){
 		//ENABLE_ECHO_INPUT: controls if the input is echoed back to console
 		//ENABLE_LINE_INPUT: controls if buffer read yields until new line escape sequence is passed similar to (ICANON)
 
-		DWORD fdwRaw = ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT)	
+		DWORD fdwRaw = ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);	
 		
 		//check if setConsoleMode failed to set the terminal settings in raw mode
 		if(!SetConsoleMode(hstdin,fdwRaw)){
@@ -157,7 +157,7 @@ intmax_t readTerminalInput(char buffer[4096]){
 	#ifdef _WIN32 //windows platform
 		
 		//decleration of readSize variable
-		LPDWORD readSize;
+		DWORD readSize;
 		
 		//check if read from stdin failed
 		if(! ReadConsole(hstdin,buffer, 4096, &readSize, NULL)){
