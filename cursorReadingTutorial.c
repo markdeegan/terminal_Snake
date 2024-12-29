@@ -28,7 +28,7 @@ int main(int argc, char** argv){
 	atexit(exitRawMode);
 
 	//function defined in terminalControl.h to enter raw mode
-	enterRawMode(&originalSettings);	
+	enterRawMode();	
 	
 	//clear the terminal display and move cursor to home
 	printf("\e[2J\e[H");
