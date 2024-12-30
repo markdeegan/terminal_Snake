@@ -3,9 +3,6 @@
  * Purpose: To showcase the nonconoical or raw mode terminal configuration. this program will read the stdin buffer and print the read character to the terminal until a escape character is pressed.
  * */
 
-//standard c library for input/output control
-#include <stdio.h>
-
 //standard c library for misc controls for memeory and error handling 
 #include <stdlib.h>
 
@@ -15,23 +12,34 @@
 //macro for escape character to terminate the program once read
 #define escapeChar 'q' 
 
-//decleration of original settings variable
-struct termios original_Settings;
-
-//decleration of function to exit raw mode
-void exitRawMode(void);
-
 //start of main method
 int main(int argc, char** argv){	
 	
-	//store the original settings
-	tcgetattr(STDIN_FILENO, &original_Settings);
+	//get the originalSettings and store on platform specific originalSettings variables
+	//check if the function failed
+	if(getOriginalSettings() == GET_SETTINGS_FAIL){
+		
+		//print error out to terminal
+		fprintf(stderr,"\e[31mgetOriginalSettings() failed to retrieve terminal settings!\e[m\n");
+		
+		//return with exit code indicating getOriginalSettings() failed
+		return 1;
+
+	}
 	
 	//bind the exitRawMode fuction on exit of this main method (resets terminal to orignal settings)
 	atexit(exitRawMode);
 
 	//call the function to enter raw mode
-	enterRawMode(&original_Settings);
+	if(enterRawMode() == RAW_MODE_FAIL){
+	
+		//print error out to terminal
+		fprintf(stderr,"\e[31menterRawMode() failed to set terminal into raw mode!\e[m\n");
+	
+		//return with exit code indicating enterRawMode() failed
+		return 2;
+
+	}
 
 	//loop break variable to stop read loop
 	int exitCondition = 0;
@@ -41,16 +49,22 @@ int main(int argc, char** argv){
 
 	//loop until exit condition is met
 	while(!exitCondition){
-	
-		//using unistd.h read() function we read the contents of the buffer into the buffer variable
-		ssize_t readSize = read(STDIN_FILENO, &buffer, sizeof(buffer));
+		
+		intmax_t readSize = readTerminalInput(buffer);	
 		
 		//check if the stdin buffer has no content or failed
-		if(readSize <= 0){
+		if(readSize == 0){
 			
 			//we skip that read cycle
 			continue;
 		
+		}else if(readSize == READ_FAIL){//check if function failed
+			
+			//print error out to terminal	
+			printf("\e[31mreadTerminalInput() failed to read stdin buffer!\e[m\n");
+			
+			//we loop back to start of loop
+			continue;
 		}
 
 		//loop through all characters that were read and print them in line
@@ -81,10 +95,3 @@ int main(int argc, char** argv){
 
 }
 
-//definition of function to reset terminal to old settings 
-void exitRawMode(void){
-	
-	//set the terminal to the old settings provided as a parameter
-	tcsetattr(STDIN_FILENO, TCSANOW, &original_Settings);
-
-}

@@ -7,3 +7,10 @@
 //
 #define SNAKE_SUCCESS 0
 #define SNAKE_FAILURE 1
+
+//definition of error exit code for getOriginalSettings()
+#define INIT_ERROR_SETTINGS 2 
+
+//definition of error exit code for enterRawMode()
+#define INIT_ERROR_RAW_MODE 3
+
