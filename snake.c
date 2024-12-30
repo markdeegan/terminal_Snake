@@ -18,12 +18,6 @@
 // MD20241229-04 custom snake error codes
 #include "errors.h"
 
-//definition of error exit code for getOriginalSettings()
-#define INIT_ERROR_SETTINGS 2 
-
-//definition of error exit code for enterRawMode()
-#define INIT_ERROR_RAW_MODE 3
-
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y);
 
