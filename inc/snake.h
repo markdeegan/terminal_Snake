@@ -16,7 +16,7 @@
 #define ESCAPECHAR 'q'
 
 //macro definition of frame frame used to control the yield time of each frame
-#define FRAMERATE 1/60 
+#define FRAMERATE 1/30 
 
 //macro definition of snake movement delay time in seconds
 #define MOVEDELAY .25
@@ -31,13 +31,13 @@
 #define UPPERBOUND (TITLEOFFSET + 2)
 
 //macro definition to define the lower boundary of the game area
-#define LOWERBOUND (AREAHEIGHT + 4 + TITLEOFFSET)
+#define LOWERBOUND (AREAHEIGHT + 1 + TITLEOFFSET)
 
 //macro definition to define the left boundary of the game area
 #define LEFTBOUND 2
 
 //macro definition to define the right boundary of the game area
-#define RIGHTBOUND ((ASPECTRATIO * AREAHEIGHT) + 3)
+#define RIGHTBOUND (ASPECTRATIO * AREAHEIGHT) + 3
 
 //definition of a snake part structure
 struct snakePart {
@@ -78,13 +78,13 @@ void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int lenght);
 void createGameArea(){
 	
 	//loop through all the game area rows
-	for(int i = 0; i <= (AREAHEIGHT + 2); i++){
+	for(int i = 0; i < AREAHEIGHT; i++){
 
 		if(i == 0){
 			
 			printf("\e(0l\e(B");//draws left top corner using designated character set 0
 		
-		}else if(i == AREAHEIGHT + 2){
+		}else if(i == AREAHEIGHT-1){
 		
 			printf("\e(0m\e(B");//draws bottom right corner
 		
@@ -95,10 +95,10 @@ void createGameArea(){
 		}
 
 		//loop through all the column values
-		for(int j = 0; j < (RIGHTBOUND); j++){
+		for(int j = 0; j < (AREAHEIGHT * ASPECTRATIO); j++){
 		
 			//check if the current line is the top or bottom
-			if( (i == 0 ) ||  (i == (AREAHEIGHT + 2)) ){
+			if( (i == 0 ) ||  (i == (AREAHEIGHT-1)) ){
 			
 				printf("-");//prints a heavy straight bar
 			
@@ -114,7 +114,7 @@ void createGameArea(){
 		
 			printf("\e(0k\e(B");//prints top right corner
 		
-		}else if(i == AREAHEIGHT + 2){
+		}else if(i == AREAHEIGHT - 1){
 		
 			printf("\e(0j\e(B");//prints bottom right corner
 		
