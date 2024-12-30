@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 //include my header to manipulate the terminal
-#include "inc/terminalControl.h"
+#include "terminalControl.h"
 
 //macro definiton for character used to escape program loop
 #define ESCAPECHAR 'q'

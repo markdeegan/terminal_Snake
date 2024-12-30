@@ -10,10 +10,10 @@
 #include <time.h>
 
 //custom terminal control header
-#include "inc/terminalControl.h"
+#include "terminalControl.h"
 
 //custom snake game header
-#include "inc/snake.h"
+#include "snake.h"
 
 // MD20241229-04 custom snake error codes
 #include "errors.h"

@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 //include my custom terminal control header
-#include "inc/terminalControl.h"
+#include "terminalControl.h"
 
 //start of main method
 int main(int argc, char** argv){
