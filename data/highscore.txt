@@ -1,2 +1,2 @@
 highscore: 51
-highscore: 5
+highscore: 5highscore: 6
