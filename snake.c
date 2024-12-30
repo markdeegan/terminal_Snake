@@ -31,7 +31,7 @@ void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, in
 int main(int argc, char** argv){
 	
 	//defines if the game is ran in debugging mode (infromation printed on screen)
-	int debuggingMode;
+	int debuggingMode = 0;
 
 	//decleration of variable to hold the time since last snake move
 	clock_t timeToMove;
