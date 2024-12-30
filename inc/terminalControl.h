@@ -274,6 +274,18 @@ intmax_t readTerminalInput(char buffer[4096]){
 		
 		//decleration of readSize variable
 		DWORD readSize;
+		
+		//read how much is in the stdin buffer
+		//this is needed as windows is event driven unlike POSIX which uses timers on input and output
+		GetNumberOfConsoleInputEvents(hstdin,&readSize);
+
+		//if there is nothing in the buffer
+		if(readSize == 0){
+			
+			//return nothing as the buffer is empty
+			return (intmax_t) readSize;
+		
+		}
 
 		//check if read from stdin failed by getting the last exit return code
 		if(!ReadConsole(hstdin,buffer, 4096, &readSize, NULL)){
