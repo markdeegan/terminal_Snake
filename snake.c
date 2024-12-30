@@ -120,7 +120,10 @@ int main(int argc, char** argv){
 	timeToMove = clock();
 	
 	//call function to add a fruit to the game area
-	addFruit(snake, &fruit, lenght);
+	addFruit(snake, &fruit, lenght);	
+
+	//print the current highscore for user
+	printf("\e7\e[%d;%dH\e[Khighscore: %d\e8", UPPERBOUND + (AREAHEIGHT/2) + 1, RIGHTBOUND + 2 ,getHighscore());	
 
 	//start of game loop
 	while(!gameBreak){
@@ -179,12 +182,17 @@ int main(int argc, char** argv){
 			printf("\e7\e[%d;0H\e[K\e[31mcollided with %s\e[m\e8", LOWERBOUND + 2, "snake part (Game over)");	
 		}
 		
+		//print the current score for user
+		printf("\e7\e[%d;%dH\e[Kscore: %d\e8", UPPERBOUND + (AREAHEIGHT/2), RIGHTBOUND + 2 ,lenght);	
 
 		//wait till the frame rate is matched (waits till new frame should be rendered)
 		while((float) FRAMERATE > (float) (clock() - startTime)/CLOCKS_PER_SEC );
 	
 	}
 	
+	//call function to save the score if its a new highscore
+	saveHighscore(lenght);
+
 	printf("\e[%d;0HUpper: %d, lower: %d, left: %d, right: %d\n", LOWERBOUND + 3, UPPERBOUND, LOWERBOUND, LEFTBOUND, RIGHTBOUND);
 	printf("\e[?25h\e[%d;0H",LOWERBOUND+4);//returns cursor to out of bound area of game space and make it visible again
 

@@ -74,6 +74,9 @@ void changePos(struct snakePart* object, int x, int y);
 //decleration of updateOtherParts()
 void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int lenght);
 
+//decleration of saveHighscore()
+int saveHighscore(int score);
+
 //definition of function to generate the game area
 void createGameArea(){
 	
@@ -393,3 +396,72 @@ void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int lenght){
 	}
 
 } // MD20241228-06 end definition of the updateOtherParts function
+
+int saveHighscore(int score){
+	
+	//attempt to open high score file 
+	FILE* hsFile = fopen("data/highscore.txt", "a");
+	
+	//decleration of highscore variable
+	int highscore = 0;
+
+	//check if opening high score file failed
+	if(hsFile == NULL){
+	
+		fprintf(stderr, "\e[31mfopen() failed to open highscore.txt");
+		
+		//return none positive value
+		return -1;
+	}
+
+
+	fseek(hsFile,0,SEEK_SET);//move back to the start of the file
+	
+	//read the old data 
+	fscanf(hsFile,"highscore: %d", &highscore);	
+	
+	//check if new score is higher than previous highscore
+	if(highscore < score){
+		
+		//move file pointer back to the beginning
+		fseek(hsFile, 0, SEEK_SET);	
+
+		//set the new score as the high score
+		fprintf(hsFile,"highscore: %d", score);
+	
+	}
+
+	fclose(hsFile);//close the high score file
+	
+	return 0;
+
+}
+
+//function to return current highscore
+int getHighscore(){
+	
+	//call function to open highscore file
+	FILE* hsFile = fopen("data/highscore.txt", "r");
+
+	int highscore = 0;
+
+	//failed to open highscore file
+	if(hsFile == NULL){
+
+		return 0;
+	
+	}
+
+	//move file pointer to start of file
+	fseek(hsFile, 0, SEEK_SET);
+	
+	//read the highscore value
+	fscanf(hsFile,"highscore: %d", &highscore);
+
+	//close the file
+	fclose(hsFile);
+	
+	//return the highscore value
+	return highscore;
+
+}
