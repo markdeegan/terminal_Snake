@@ -81,12 +81,12 @@ void createGameArea(){
 	for(int i = 0; i <= (AREAHEIGHT + 2); i++){
 
 		if(i == 0){
-		
-			printf("\u250F");//draws left top corner
+			
+			printf("\e(0l\e(B");//draws left top corner using designated character set 0
 		
 		}else if(i == AREAHEIGHT + 2){
 		
-			printf("\u2517");//draws bottom right corner
+			printf("\e(0m\e(B");//draws bottom right corner
 		
 		}else{
 		
@@ -112,11 +112,11 @@ void createGameArea(){
 
 		if(i == 0){
 		
-			printf("\u2513");//prints top right corner
+			printf("\e(0k\e(B");//prints top right corner
 		
 		}else if(i == AREAHEIGHT + 2){
 		
-			printf("\u251B");//prints bottom right corner
+			printf("\e(0j\e(B");//prints bottom right corner
 		
 		}else{
 		
