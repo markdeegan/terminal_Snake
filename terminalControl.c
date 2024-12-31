@@ -235,13 +235,18 @@ intmax_t readTerminalInput(char buffer[4096]){
 		
 		//decleration of readSize variable
 		DWORD readSize;
-		
+			
 		//decleration of buffer to read the input enteries in stdin
 		INPUT_RECORD peekBuffer[100];	
-
+		
+		
 		//read how much is in the stdin buffer
 		//this is needed as windows is event driven unlike POSIX which uses timers on input and output
-		PeekConsoleInput(hstdin, peekBuffer, 100,&readSize);
+		if(!PeekConsoleInput(hstdin, peekBuffer, 100,&readSize)){
+		
+			return READ_FAIL;
+		
+		}
 		
 		//decleration of variable to hold if key was found
 		int keyFound = 0;
@@ -265,6 +270,7 @@ intmax_t readTerminalInput(char buffer[4096]){
 			return (intmax_t) 0;
 		
 		}
+<<<<<<< HEAD
 
 		/*//if there is nothing in the buffer
 		if(readSize == 0){
@@ -277,17 +283,37 @@ intmax_t readTerminalInput(char buffer[4096]){
 
 		//check if read from stdin failed by getting the last exit return code
 		if(!ReadConsole(hstdin,buffer, 4096, &readSize, NULL)){
+=======
 		
-			//print error out to terminal
-			fprintf(stderr, "\e[31mreadConsole() failed to read from stdin!\e[m\n");
-			
-			//return failed read exit code
+		//check if console read failed		
+		if(!ReadConsoleInput(hstdin, peekBuffer, 100,&readSize)){
+>>>>>>> remotes/origin/HEAD
+		
 			return READ_FAIL;
 		
 		}
+			
+		//definition of scroll vairable to iterate over the passed buffer
+		int bufferScroll = 0;
+
+		//loop through all event enteries that were recorded from stdin buffer
+		for(int i = 0; i < readSize; i++){
+			
+			//the event was a key
+			if(peekBuffer[i].EventType == KEY_EVENT){
+				
+				//set current buffer index to the ascii character recorded
+				buffer[bufferScroll] = peekBuffer[i].Event.KeyEvent.uChar.AsciiChar;
+				
+				//move index position
+				bufferScroll++;
+
+			}
 		
-		//return the readSize typecasted to max int size on system
-		return (intmax_t) readSize;
+		}
+
+		//return the number of key event enteries passed into the buffer argument
+		return (intmax_t) bufferScroll;
 
 	#else //POSIX platform
 		
