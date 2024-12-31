@@ -20,10 +20,12 @@ The traditional method of rendering frames is by updating the image space at a s
 ## Currently in the works
 The current tasks that are planned to implemented are as follows:
 * cross compiling to windows and linux distrbutions
-* colours for fruits and snakes
 * score system
 * global score system using MQTT protocol
 * event handle on terminal resize to adjust game area dimensions and title
+* game launch menu UI to allow for preferance configuration
+    * colours for fruits and snakes
+* JASON format parser to use for mqtt messaging and game configuration save file
 * [Next Steps](NextSteps.md)
 
 # Useful links
