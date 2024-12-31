@@ -50,6 +50,9 @@
 //definition of error return code of readCursorPos() when sscanf() fails to read buffer data
 #define GET_POS_FAIL -6
 
+//definition of error return code for windows platform in getOriginalSettings()
+#define SET_OUTPUT_FAIL -7
+
 //function to return the terminal row & column size
 int getTerminalSize();	
 	
