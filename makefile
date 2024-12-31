@@ -10,7 +10,11 @@ clean:
 
 #rule to make the snake executable
 snake: snake.c
-	$(CXX) $(CXXFLAGS) -o ./bin/snake.exe snake.c
+	$(CXX) $(CXXFLAGS) ./bin/snake_helpers.o snake.c -o ./bin/snake.exe
+
+#rule to make the snake helpers
+snake_helpers: snake_helpers.c
+	$(CXX) $(CXXFLAGS) -c -o ./bin/snake_helpers.o snake_helpers.c
 
 #rule to make the example raw mode program
 rawModeExample: rawModeExample.c
