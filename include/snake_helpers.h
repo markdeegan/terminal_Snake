@@ -8,34 +8,34 @@
 #include "snake.h"
 
 //decleration of createGameArea()
-void createGameArea(void);
+void createGameArea();
 
 //decleration of getDirection()
-int getDirection(char*);
+int getDirection();
 
 //decleration of printTitle()
-void printTitle(void);
+void printTitle();
 
 //decleration of addLenght()
-void addLenght(struct snakePart[MAXSNAKESIZE], int*, int);
+void addLenght();
 
 //decleration of moveSnake()
-int moveSnake(struct snakePart[MAXSNAKESIZE],struct snakePart* fruit, int*, int, clock_t*);
+int moveSnake();
 
 //decleration of pickRandomLocation()
-void pickRandomLocation(struct snakePart*);
+void pickRandomLocation();
 
 //decleration of addFruit()
-void addFruit(struct snakePart snake[MAXSNAKESIZE], struct snakePart*, int);
+void addFruit();
 
 //decleration of changePos()
-void changePos(struct snakePart*, int, int);
+void changePos();
 
 //decleration of updateOtherParts()
-void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int);
+void updateOtherParts();
 
 //decleration of saveHighscore()
-int saveHighscore(int);
+int saveHighscore();
 
 // declaration of getHighScore
-int getHighscore(void);
+int getHighscore();
