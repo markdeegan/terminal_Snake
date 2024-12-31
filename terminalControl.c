@@ -270,24 +270,10 @@ intmax_t readTerminalInput(char buffer[4096]){
 			return (intmax_t) 0;
 		
 		}
-<<<<<<< HEAD
-
-		/*//if there is nothing in the buffer
-		if(readSize == 0){
-			
-			//return nothing as the buffer is empty
-			return (intmax_t) readSize;
-		
-		}
-		*/
-
-		//check if read from stdin failed by getting the last exit return code
-		if(!ReadConsole(hstdin,buffer, 4096, &readSize, NULL)){
-=======
 		
 		//check if console read failed		
 		if(!ReadConsoleInput(hstdin, peekBuffer, 100,&readSize)){
->>>>>>> remotes/origin/HEAD
+
 		
 			return READ_FAIL;
 		
