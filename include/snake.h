@@ -1,10 +1,13 @@
 /*
  * Porgrammer: Matas Noreika Thu Dec 26 05:31:50 PM GMT 2024
- * Purpose: This header is designed to hold definitions of variables and functions associated with the terminal snake game
+ * Purpose: This header is designed to hold declerations of variables and exit codes associated with the terminal snake game
 */
 
 //include the standard c header for I/O manipulation
 #include <stdio.h>
+
+/////////////////////GAMEPLAY VARIABLE DEFINTIONS
+
 
 //macro defiition of the game area height
 #define AREAHEIGHT 20
@@ -46,3 +49,24 @@ struct snakePart {
 	int yPos;
 		
 };
+
+
+//////////////////////END OF GAMEPLAY VARIABLE DEFINITIONS
+
+
+//////////////////////EXIT CODE DEFINITIONS
+
+
+// MD20241229-02 errors.h to define some error codes
+//
+#define SNAKE_SUCCESS 0
+#define SNAKE_FAILURE 1
+
+//definition of error exit code for getOriginalSettings()
+#define INIT_ERROR_SETTINGS 2 
+
+//definition of error exit code for enterRawMode()
+#define INIT_ERROR_RAW_MODE 3
+
+
+/////////////////////END OF EXIT CODE DEFINITIONS
