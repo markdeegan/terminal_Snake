@@ -21,6 +21,7 @@ The traditional method of rendering frames is by updating the image space at a s
 The current tasks that are planned to implemented are as follows:
 * cross compiling to windows and linux distrbutions
 * additional check on keypress to prevent backwards movement
+* Add speed adjust on y axis to match the difference in aspect ratio
 * score system
 * global score system using MQTT protocol
 * event handle on terminal resize to adjust game area dimensions and title

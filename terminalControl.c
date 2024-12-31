@@ -266,13 +266,14 @@ intmax_t readTerminalInput(char buffer[4096]){
 		
 		}
 
-		//if there is nothing in the buffer
+		/*//if there is nothing in the buffer
 		if(readSize == 0){
 			
 			//return nothing as the buffer is empty
 			return (intmax_t) readSize;
 		
 		}
+		*/
 
 		//check if read from stdin failed by getting the last exit return code
 		if(!ReadConsole(hstdin,buffer, 4096, &readSize, NULL)){
