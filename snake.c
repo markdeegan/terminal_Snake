@@ -13,7 +13,14 @@
 #include "terminalControl.h"
 
 //custom snake game header
-#include "snake.h"
+// MD20241231-01 snake.h is included by snake_helpers.h so is not 
+// also required in addition to snake_helpers.h
+// #include "snake.h"
+
+//custom snake game functions
+// MD20241231-01 moving certain definitions to 
+// snake_helpers.h and snake_helpers.c
+#include "snake_helpers.h"
 
 // MD20241229-04 custom snake error codes
 #include "errors.h"
