@@ -236,9 +236,35 @@ intmax_t readTerminalInput(char buffer[4096]){
 		//decleration of readSize variable
 		DWORD readSize;
 		
+		//decleration of buffer to read the input enteries in stdin
+		INPUT_RECORD peekBuffer[100];	
+
 		//read how much is in the stdin buffer
 		//this is needed as windows is event driven unlike POSIX which uses timers on input and output
-		GetNumberOfConsoleInputEvents(hstdin,&readSize);
+		PeekConsoleInput(hstdin, peekBuffer, 100,&readSize);
+		
+		//decleration of variable to hold if key was found
+		int keyFound = 0;
+
+		//loop through all input enteries
+		for(int i = 0; i < readSize; i ++){
+		
+			//check if it was a key press
+			if(peekBuffer[i].EventType == KEY_EVENT){
+			
+				keyFound = 1;
+				break;
+
+			}
+
+		}
+		
+		//return 0 if key was not pressed
+		if(!keyFound){
+		
+			return (intmax_t) 0;
+		
+		}
 
 		//if there is nothing in the buffer
 		if(readSize == 0){
