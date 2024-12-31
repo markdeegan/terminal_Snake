@@ -9,21 +9,11 @@
 //standard c header for time functionality
 #include <time.h>
 
-//custom terminal control header
-#include "terminalControl.h"
+//include custom cross-platform terminal control library
+#include "terminalControl.h"  
 
-//custom snake game header
-// MD20241231-01 snake.h is included by snake_helpers.h so is not 
-// also required in addition to snake_helpers.h
-// #include "snake.h"
-
-//custom snake game functions
-// MD20241231-01 moving certain definitions to 
-// snake_helpers.h and snake_helpers.c
+//custom snake game static library 
 #include "snake_helpers.h"
-
-// MD20241229-04 custom snake error codes
-#include "errors.h"
 
 //decleration of function to print debugging stats to terminal if debug mode is enabled
 void printDebugStats(struct snakePart snake[MAXSNAKESIZE], int lenght, int x, int y);
@@ -36,7 +26,7 @@ int main(int argc, char** argv){
 
 	//decleration of variable to hold the time since last snake move
 	clock_t timeToMove;
-
+	
 	//decleration of snake variable
 	struct snakePart snake[MAXSNAKESIZE];
 

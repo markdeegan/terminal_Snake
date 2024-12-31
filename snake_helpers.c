@@ -1,11 +1,13 @@
-// Matas NOREIKA, Mark DEEGAN Tue Dec 31 12:19:17 GMT 2024
-// snake_helpers
-//
+/*
+ * Programmers: Matas Noreika, Mark Deegan Tue Dec 31 12:19:17 GMT 2024
+ * Purpose: definitions for snake_helpers static library functions
+*/
 
+//include the variable and function definitions of the snake_helpers header
 #include "snake_helpers.h"
 
 //definition of function to generate the game area
-void createGameArea(){
+void createGameArea(void){
 	
 	//loop through all the game area rows
 	for(int i = 0; i < AREAHEIGHT; i++){
@@ -87,14 +89,14 @@ int getDirection(char* buffer){
 		case 'D':
 			return 4;//return right direction
 	
-		default:
+		default://invaild character handling
 			return 0;//return 0 indicating no change
 	}
 } // end definition of snake control function (returns direction int 1 = forward, 2 = backwards, 3 = left, 4 = right)
 
 //Matas - added additional comment to functionality of printTitle()
 //definition of function to print the game title
-void printTitle(){
+void printTitle(void){
 
 	//open the text file
 	FILE* titleFile = fopen("title.txt", "r");
@@ -369,7 +371,7 @@ int saveHighscore(int score){
 } // end definition of saveHighScore function
 
 //function to return current highscore
-int getHighscore(){
+int getHighscore(void){
 	
 	//call function to open highscore file
 	FILE* hsFile = fopen("data/highscore.txt", "r");
