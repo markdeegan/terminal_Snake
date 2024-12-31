@@ -74,7 +74,7 @@ int getTerminalSize(int* x, int* y){
 		
 	#endif
 
-}
+} // end function to return the terminal row & column size
 
 //function to store the current terminal settings into target platform variable location
 int getOriginalSettings(){
@@ -134,7 +134,7 @@ int getOriginalSettings(){
 
 	#endif
 
-}
+} // end function to store the current terminal settings into target platform variable location
 
 //function to enter raw mode from concoical mode
 int enterRawMode(){
@@ -197,10 +197,10 @@ int enterRawMode(){
 
 	#endif
 
-}
+} // end function to enter raw mode from concoical mode
 
 //function to exit raw mode
-//no return can be set due to this function usually being binded to atexit()
+//no return can be set due to this function usually being bound to atexit()
 void exitRawMode(){
 
 	#ifdef _WIN32 //windows platform
@@ -225,7 +225,7 @@ void exitRawMode(){
 
 	#endif
 
-}
+} // endf function to exit raw mode
 
 //function to read from terminal input buffer independent of platform
 //returns the read size as max int size in current system to avoid conflict with ssize_t on other platforms 
@@ -324,7 +324,7 @@ intmax_t readTerminalInput(char buffer[4096]){
 
 	#endif
 
-}
+} // end function to read from terminal input buffer independent of platform
 
 //function to use ANSI escape codes to retrieve the cursor position
 int readCursorPos(int*x, int* y){
@@ -382,4 +382,4 @@ int readCursorPos(int*x, int* y){
 	//return exit code indicating success on retrieving cursor position
 	return TERMINALCONTROLSUCCESS;
 
-}
+} // end function to use ANSI escape codes to retrieve the cursor position
