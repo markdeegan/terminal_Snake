@@ -54,7 +54,8 @@
 #define SET_OUTPUT_FAIL -7
 
 //function to return the terminal row & column size
-int getTerminalSize();	
+// MD20250104-02 Fixing disparities in function declarations
+int getTerminalSize(int*, int*);	
 	
 //function to store the current terminal settings into target platform variable location
 //this function must be called prior enterRawMode()
@@ -69,7 +70,9 @@ void exitRawMode();
 	
 //function to read from terminal input buffer independent of platform
 //returns the read size as max int size in current system to avoid conflict with ssize_t on other platforms 
-intmax_t readTerminalInput();
+// MD20250104-02 Fixing disparities in function declarations
+intmax_t readTerminalInput(char*);
 
 //function to use ANSI escape codes to retrieve the cursor position
-int readCursorPos();
+// MD20250104-02 Fixing disparities in function declarations
+int readCursorPos(int*, int*);

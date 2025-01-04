@@ -327,7 +327,7 @@ intmax_t readTerminalInput(char buffer[4096]){
 } // end function to read from terminal input buffer independent of platform
 
 //function to use ANSI escape codes to retrieve the cursor position
-int readCursorPos(int*x, int* y){
+int readCursorPos(int* x, int* y){
 	
 	//decleration of readBuffer
 	char buffer[4096];
