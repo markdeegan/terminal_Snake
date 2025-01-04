@@ -89,13 +89,15 @@ struct snakePart {
 void createGameArea();
 
 //decleration of getDirection()
-int getDirection();
+// MD20250104-03 Addressing declaration and definition conflicts
+int getDirection(char *);
 
 //decleration of printTitle()
 void printTitle();
 
 //decleration of addLenght()
-void addLenght();
+// MD20250104-03 Addressing declaration and definition conflicts
+void addLenght(struct snakePart*, int*, int);
 
 //decleration of moveSnake()
 int moveSnake();
@@ -104,7 +106,8 @@ int moveSnake();
 void pickRandomLocation();
 
 //decleration of addFruit()
-void addFruit();
+// MD20250104-03 Addressing declaration and definition conflicts
+void addFruit(struct snakePart*, struct snakePart*, int);
 
 //decleration of changePos()
 void changePos();
