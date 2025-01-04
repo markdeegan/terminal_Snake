@@ -33,3 +33,4 @@ The current tasks that are planned to implemented are as follows:
 # Useful links
 * [ANSI ESCAPE CODES](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
 * [TEXT TO ASCII ART](https://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20)
+* [MQTT V3.1.1 RFC document](https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718009)
