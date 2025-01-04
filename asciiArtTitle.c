@@ -9,6 +9,12 @@
 //include my custom terminal control header
 #include "terminalControl.h"
 
+// MD202501-04 define the name of the file to open 
+// This, of course might be replaced with a command-line argument
+// indicating the file we wish to display.
+// Now, where have I seen that before? 
+#define FileArtName "title.txt"
+
 //start of main method
 int main(int argc, char** argv){
 
@@ -33,13 +39,15 @@ int main(int argc, char** argv){
 	FILE* titleFile;
 
 	//open the title art for reading and check if the opening failed
-	if( (titleFile = fopen("title.txt", "r")) == NULL){
+	if( (titleFile = fopen(FileArtName, "r")) == NULL){
 	
 		return 2;//failed to open file
 	
-	}
+	} // iMD20250104-01 error checking for attempt to open the file
+	// MD20250104-01 note I have moved the definition of th file
+	// name to a global #define above
 
-	//intitalise read buffer
+	// declare read buffer
 	char buffer[256];
 	
 	//loop until end of file character is reached
@@ -52,9 +60,10 @@ int main(int argc, char** argv){
 		printf("%s", buffer);
 
 	}while(!(feof(titleFile)));
+	// continue as long as we have not yet reached end of file 
 
 	fclose(titleFile);//close the file once reading is complete
 
 	return 0;//return exit code indicating program was successful
 
-}
+} // MD20250104-01 end main nmethod for asciiArtTitle
