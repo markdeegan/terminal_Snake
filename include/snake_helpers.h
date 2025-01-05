@@ -100,23 +100,23 @@ void printTitle();
 void addLenght(struct snakePart*, int*, int);
 
 //decleration of moveSnake()
-int moveSnake();
+int moveSnake(struct snakePart*, struct snakePart*, int*, int, clock_t*);
 
 //decleration of pickRandomLocation()
-void pickRandomLocation();
+void pickRandomLocation(struct snakePart*);
 
 //decleration of addFruit()
 // MD20250104-03 Addressing declaration and definition conflicts
 void addFruit(struct snakePart*, struct snakePart*, int);
 
 //decleration of changePos()
-void changePos();
+void changePos(struct snakePart* , int,  int);
 
 //decleration of updateOtherParts()
-void updateOtherParts();
+void updateOtherParts(struct snakePart*, int);
 
 //decleration of saveHighscore()
-int saveHighscore();
+int saveHighscore(int);
 
 // declaration of getHighScore
 int getHighscore();
