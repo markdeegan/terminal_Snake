@@ -10,13 +10,13 @@
 void createGameArea(void){
 	
 	//loop through all the game area rows
-	for(int i = 0; i < AREAHEIGHT; i++){
+	for(int row = 0; row < AREAHEIGHT; row++){
 
-		if(i == 0){
+		if(row == 0){
 			
 			printf("\e(0l\e(B");//draws left top corner using designated character set 0
 		
-		}else if(i == AREAHEIGHT-1){
+		}else if(row == AREAHEIGHT-1){
 		
 			printf("\e(0m\e(B");//draws bottom right corner
 		
@@ -27,10 +27,10 @@ void createGameArea(void){
 		}
 
 		//loop through all the column values
-		for(int j = 0; j < (AREAHEIGHT * ASPECTRATIO); j++){
+		for(int column = 0; column < (AREAHEIGHT * ASPECTRATIO); column++){
 		
 			//check if the current line is the top or bottom
-			if( (i == 0 ) ||  (i == (AREAHEIGHT-1)) ){
+			if( (row == 0 ) ||  (row == (AREAHEIGHT-1)) ){
 			
 				printf("-");//prints a heavy straight bar
 			
@@ -42,11 +42,11 @@ void createGameArea(void){
 		
 		}
 
-		if(i == 0){
+		if(row == 0){
 		
 			printf("\e(0k\e(B");//prints top right corner
 		
-		}else if(i == AREAHEIGHT - 1){
+		}else if(row == AREAHEIGHT - 1){
 		
 			printf("\e(0j\e(B");//prints bottom right corner
 		
