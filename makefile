@@ -2,7 +2,7 @@ CXX		 = gcc
 CXXFLAGS = -iquote ./include
 
 #rule to make all executables
-all: terminalControl snake_helpers rawModeExample cursorReadingTutorial asciiArtTitle snake 
+all: cornersExample terminalControl snake_helpers rawModeExample cursorReadingTutorial asciiArtTitle snake 
 
 #removes all executables in the binary folder 
 clean: 
@@ -16,6 +16,10 @@ snake_helpers: snake_helpers.c
 #rule to make terminalControl static library
 terminalControl: terminalControl.c
 	$(CXX) $(CXXFLAGS) -c -o ./bin/terminalControl.o terminalControl.c
+
+#rule to make the corners example
+cornersExample: cornersExample.c
+	$(CXX) $(CXXFLAGS) cornersExample.c -o ./bin/cornersExample.exe
 
 #rule to make the example raw mode program
 rawModeExample: terminalControl rawModeExample.c
