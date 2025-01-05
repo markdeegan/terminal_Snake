@@ -6,7 +6,7 @@
 //include the variable and function definitions of the snake_helpers header
 #include "snake_helpers.h"
 
-//definition of function to generate the game area
+/* definition of function to generate the game area */
 void createGameArea(void){
 	
 	//loop through all the game area rows
