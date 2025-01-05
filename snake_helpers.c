@@ -124,28 +124,28 @@ void printTitle(void){
 //definition of function to add to snake lenght
 //Matas - relocated addLenght() to header for less clutter in snake.c
 //Matas - added additional argument to function to pass current snake lenght and snake variable
-void addLenght(struct snakePart snake[MAXSNAKESIZE], int* lenght, int direction){
+void addLenght(struct snakePart snake[MAXSNAKESIZE], int* p_lenght, int direction){
 
-	*lenght += 1;//incrament the lenght variable
+	*(p_lenght) += 1;//incrament the lenght variable
 	
 	//we do a switch case on direction to determine where new snake part should spawn relative to previous snake part
 	switch(direction){
 	
 		case 1://we are moving up
-			snake[*lenght-1].xPos = snake[*lenght-2].xPos + 1;
-		       	snake[*lenght-1].yPos = snake[*lenght-2].yPos;	
+			snake[*p_lenght-1].xPos = snake[*p_lenght-2].xPos + 1;
+		       	snake[*p_lenght-1].yPos = snake[*p_lenght-2].yPos;	
 			break;
 		case 2://we are moving down
-			snake[*lenght-1].xPos = snake[*lenght-2].xPos - 1;
-			snake[*lenght-1].yPos = snake[*lenght-2].yPos;
+			snake[*p_lenght-1].xPos = snake[*p_lenght-2].xPos - 1;
+			snake[*p_lenght-1].yPos = snake[*p_lenght-2].yPos;
 			break;
 		case 3://we are moving left
-			snake[*lenght-1].xPos = snake[*lenght-2].xPos;
-			snake[*lenght-1].yPos = snake[*lenght-2].yPos - 1;
+			snake[*p_lenght-1].xPos = snake[*p_lenght-2].xPos;
+			snake[*p_lenght-1].yPos = snake[*p_lenght-2].yPos - 1;
 			break;
 		case 4://we are moving right
-			snake[*lenght-1].xPos = snake[*lenght-2].xPos;
-			snake[*lenght-1].yPos = snake[*lenght-2].yPos + 1;
+			snake[*p_lenght-1].xPos = snake[*p_lenght-2].xPos;
+			snake[*p_lenght-1].yPos = snake[*p_lenght-2].yPos + 1;
 			break;
 
 	}
