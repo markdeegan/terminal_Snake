@@ -1,5 +1,6 @@
 CXX		 = gcc
 CXXFLAGS = -iquote ../include
+LOCALLIB = ../lib
 
 #rule to make all executables
 all: cornersExample terminalControl snake_helpers rawModeExample cursorReadingTutorial asciiArtTitle snake 
@@ -8,10 +9,11 @@ all: cornersExample terminalControl snake_helpers rawModeExample cursorReadingTu
 clean: 
 	@-rm ../bin/*.exe 2> /dev/null || true
 	@-rm ../bin/*.o 2> /dev/null || true
+	@-rm $(LOCALLIB)/*.o 2> /dev/null || true
 
 #rule to make the snake helpers static library
 snake_helpers: snake_helpers.c
-	$(CXX) $(CXXFLAGS) -c -o ../bin/snake_helpers.o snake_helpers.c
+	$(CXX) $(CXXFLAGS) -c -o $(LOCALLIB)/snake_helpers.o snake_helpers.c
 
 #rule to make terminalControl static library
 terminalControl: terminalControl.c
@@ -35,5 +37,5 @@ asciiArtTitle: terminalControl asciiArtTitle.c
 
 #rule to make the snake executable
 snake: terminalControl snake_helpers snake.c
-	$(CXX) $(CXXFLAGS) ../bin/terminalControl.o ../bin/snake_helpers.o snake.c -o ../bin/snake.exe
+	$(CXX) $(CXXFLAGS) ../bin/terminalControl.o $(LOCALLIB)/snake_helpers.o snake.c -o ../bin/snake.exe
 
