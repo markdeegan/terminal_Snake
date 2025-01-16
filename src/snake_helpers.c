@@ -99,7 +99,7 @@ int getDirection(char* buffer){
 void printTitle(void){
 
 	//open the text file
-	FILE* titleFile = fopen("title.txt", "r");
+	FILE* titleFile = fopen("../title.txt", "r");
 	
 	//read buffer to read data from title file
 	char buffer[256];
@@ -332,8 +332,8 @@ void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int lenght){
 // definition of saveHighScore function
 int saveHighscore(int score){
 	
-	//attempt to open high score file 
-	FILE* hsFile = fopen("data/highscore.txt", "a");
+	//attempt to open high score file in write and read mode with truncation
+	FILE* hsFile = fopen("../data/highscore.txt", "w+");
 	
 	//decleration of highscore variable
 	int highscore = 0;
@@ -351,7 +351,7 @@ int saveHighscore(int score){
 	fseek(hsFile,0,SEEK_SET);//move back to the start of the file
 	
 	//read the old data 
-	fscanf(hsFile,"highscore: %d", &highscore);	
+	fscanf(hsFile,"%s %d", NULL,&highscore);	
 	
 	//check if new score is higher than previous highscore
 	if(highscore < score){
@@ -374,7 +374,7 @@ int saveHighscore(int score){
 int getHighscore(void){
 	
 	//call function to open highscore file
-	FILE* hsFile = fopen("data/highscore.txt", "r");
+	FILE* hsFile = fopen("../data/highscore.txt", "r");
 
 	int highscore = 0;
 
