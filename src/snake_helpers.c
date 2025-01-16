@@ -333,7 +333,7 @@ void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int lenght){
 int saveHighscore(int score){
 	
 	//attempt to open high score file in write and read mode with truncation
-	FILE* hsFile = fopen("../data/highscore.txt", "w+");
+	FILE* hsFile = fopen("../data/highscore.txt", "r+");
 	
 	//decleration of highscore variable
 	int highscore = 0;
@@ -351,10 +351,10 @@ int saveHighscore(int score){
 	fseek(hsFile,0,SEEK_SET);//move back to the start of the file
 	
 	//read the old data 
-	fscanf(hsFile,"%s %d", NULL,&highscore);	
+	fscanf(hsFile,"highscore: %d",&highscore);	
 	
-	//check if new score is higher than previous highscore
-	if(highscore < score){
+	//check if new score is higher or equal to the previous highscore
+	if(highscore <= score){
 		
 		//move file pointer back to the beginning
 		fseek(hsFile, 0, SEEK_SET);	
@@ -362,6 +362,13 @@ int saveHighscore(int score){
 		//set the new score as the high score
 		fprintf(hsFile,"highscore: %d", score);
 	
+	}else{
+	
+		//move file pointer back to the beginning of the file
+		fseek(hsFile, 0, SEEK_SET);
+
+		fprintf(hsFile, "highscore: %d", highscore);
+
 	}
 
 	fclose(hsFile);//close the high score file
