@@ -338,13 +338,23 @@ int saveHighscore(int score){
 	//decleration of highscore variable
 	int highscore = 0;
 
-	//check if opening high score file failed
+	//check if opening high score file failed to open
 	if(hsFile == NULL){
-	
-		fprintf(stderr, "\e[31mfopen() failed to open highscore.txt");
 		
-		//return none positive value
-		return -1;
+		//make the file if the file doesnt exist due to r+ mode not generating a file like w or w+ 
+		hsFile = fopen("../data/highscore.txt", "w");
+		
+		//if the fopen function failed
+		if(hsFile == NULL){
+		
+			//print error to standard error stream
+			fprintf(stderr, "\e[31mfopen() failed to open highscore.txt");
+			
+			//return none positive exit code indicating error
+			return -1;
+		
+		}
+
 	}
 
 
