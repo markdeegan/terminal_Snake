@@ -26,9 +26,8 @@ The current tasks that are planned to implemented are as follows:
 * global score system using MQTT protocol
 * event handle on terminal resize to adjust game area dimensions and title
 * game launch menu UI to allow for preferance configuration
-    * colours for fruits and snakes
-* JASON format parser to use for mqtt messaging and game configuration save file
-* [Next Steps](NextSteps.md)
+* colours for fruits and snakes* JSON format parser to use for mqtt messaging and game configuration save file
+* JSON format parser to use for mqtt messaging and game configuration save file
 
 # Useful links
 * [ANSI ESCAPE CODES](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
