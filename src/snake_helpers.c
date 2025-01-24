@@ -99,7 +99,7 @@ int getDirection(char* buffer){
 void printTitle(void){
 
 	//open the text file
-	FILE* titleFile = fopen("../title.txt", "r");
+	FILE* titleFile = fopen("title.txt", "r");
 	
 	//read buffer to read data from title file
 	char buffer[256];
@@ -332,39 +332,29 @@ void updateOtherParts(struct snakePart snake[MAXSNAKESIZE], int lenght){
 // definition of saveHighScore function
 int saveHighscore(int score){
 	
-	//attempt to open high score file in write and read mode with truncation
-	FILE* hsFile = fopen("../data/highscore.txt", "r+");
+	//attempt to open high score file 
+	FILE* hsFile = fopen("data/highscore.txt", "a");
 	
 	//decleration of highscore variable
 	int highscore = 0;
 
-	//check if opening high score file failed to open
+	//check if opening high score file failed
 	if(hsFile == NULL){
+	
+		fprintf(stderr, "\e[31mfopen() failed to open highscore.txt");
 		
-		//make the file if the file doesnt exist due to r+ mode not generating a file like w or w+ 
-		hsFile = fopen("../data/highscore.txt", "w");
-		
-		//if the fopen function failed
-		if(hsFile == NULL){
-		
-			//print error to standard error stream
-			fprintf(stderr, "\e[31mfopen() failed to open highscore.txt");
-			
-			//return none positive exit code indicating error
-			return -1;
-		
-		}
-
+		//return none positive value
+		return -1;
 	}
 
 
 	fseek(hsFile,0,SEEK_SET);//move back to the start of the file
 	
 	//read the old data 
-	fscanf(hsFile,"highscore: %d",&highscore);	
+	fscanf(hsFile,"highscore: %d", &highscore);	
 	
-	//check if new score is higher or equal to the previous highscore
-	if(highscore <= score){
+	//check if new score is higher than previous highscore
+	if(highscore < score){
 		
 		//move file pointer back to the beginning
 		fseek(hsFile, 0, SEEK_SET);	
@@ -372,13 +362,6 @@ int saveHighscore(int score){
 		//set the new score as the high score
 		fprintf(hsFile,"highscore: %d", score);
 	
-	}else{
-	
-		//move file pointer back to the beginning of the file
-		fseek(hsFile, 0, SEEK_SET);
-
-		fprintf(hsFile, "highscore: %d", highscore);
-
 	}
 
 	fclose(hsFile);//close the high score file
@@ -391,7 +374,7 @@ int saveHighscore(int score){
 int getHighscore(void){
 	
 	//call function to open highscore file
-	FILE* hsFile = fopen("../data/highscore.txt", "r");
+	FILE* hsFile = fopen("data/highscore.txt", "r");
 
 	int highscore = 0;
 
