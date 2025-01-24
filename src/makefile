@@ -28,19 +28,19 @@ cornersExample: cornersExample.c
 
 #rule to make the example raw mode program
 rawModeExample: terminalControl rawModeExample.c
-	$(CXX) $(CXXFLAGS) $(LOCALLIB)/terminalControl.o $@.c -o $(LOCALBIN)/$@.exe
+	$(CXX) $(CXXFLAGS) $(LOCALLIB)/$<.o $@.c -o $(LOCALBIN)/$@.exe
 
 #rule to make example program for cursor position reporting
 cursorReadingTutorial: terminalControl cursorReadingTutorial.c
-	$(CXX) $(CXXFLAGS) $(LOCALLIB)/terminalControl.o $@.c -o $(LOCALBIN)/$@.exe
+	$(CXX) $(CXXFLAGS) $(LOCALLIB)/$<.o $@.c -o $(LOCALBIN)/$@.exe
 
 #rule to make asciiArtTitle
 asciiArtTitle: terminalControl asciiArtTitle.c
-	$(CXX) $(CXXFLAGS) $(LOCALLIB)/terminalControl.o $@.c -o $(LOCALBIN)/$@.exe
+	$(CXX) $(CXXFLAGS) $(LOCALLIB)/$<.o $@.c -o $(LOCALBIN)/$@.exe
 
 #rule to make the snake executable
 snake: terminalControl snake_helpers snake.c
-	$(CXX) $(CXXFLAGS) $(LOCALLIB)/terminalControl.o $(LOCALLIB)/snake_helpers.o $@.c -o $(LOCALBIN)/$@.exe
+	$(CXX) $(CXXFLAGS) $(LOCALLIB)/$<.o $(LOCALLIB)/snake_helpers.o $@.c -o $(LOCALBIN)/$@.exe
 
 ############################################################################
 # rules for housekeeping
