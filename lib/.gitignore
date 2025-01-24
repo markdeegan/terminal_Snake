@@ -1,3 +1,0 @@
-#ignore all the static libraries exported into this directory
-*.o
-
